@@ -6,6 +6,7 @@ module com.retailtech.quickcasheasy {
     requires com.dlsc.formsfx;
     requires net.synedra.validatorfx;
     requires org.kordamp.bootstrapfx.core;
+    requires java.sql;
 
     opens com.retailtech.quickcasheasy to javafx.fxml;
     exports com.retailtech.quickcasheasy;

@@ -2,7 +2,7 @@ package com.retailtech.quickcasheasy.product;
 
 import java.util.List;
 
-public class ProductService {
+class ProductService {
 
     private final ProductRepository productRepository;
 

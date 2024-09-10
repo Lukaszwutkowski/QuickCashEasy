@@ -1,6 +1,7 @@
 package com.retailtech.quickcasheasy.category;
 
 import java.util.List;
+import java.util.Optional;
 
 public class CategoryFacade {
 
@@ -25,6 +26,11 @@ public class CategoryFacade {
 
     public void deleteCategory(Long id) {
         categoryService.deleteCategory(id);
+    }
+
+    public boolean categoryExists(Long categoryId) {
+        Optional<Category> category = Optional.ofNullable(categoryService.getCategoryById(categoryId));
+        return category.isPresent();  // Returns true if the category is found, false otherwise
     }
 
 }

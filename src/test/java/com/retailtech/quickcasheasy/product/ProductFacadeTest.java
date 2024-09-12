@@ -99,4 +99,32 @@ class ProductFacadeTest {
         verify(productService, times(1)).deleteProduct(barcode);
     }
 
+    @Test
+    void it_should_return_product_name() {
+        // Given
+        Product product = new Product("123", "Apple", 1.5, 1L);
+        when(productService.getProductByBarcode("123")).thenReturn(product);
+
+        // When
+        String productName = productFacade.getProductName("123");
+
+        // Then
+        assertEquals("Apple", productName);
+        verify(productService, times(1)).getProductByBarcode("123");
+    }
+
+    @Test
+    void it_should_return_product_price() {
+        // Given
+        Product product = new Product("123", "Apple", 1.5, 1L);
+        when(productService.getProductByBarcode("123")).thenReturn(product);
+
+        // When
+        double productPrice = productFacade.getProductPrice("123");
+
+        // Then
+        assertEquals(1.5, productPrice);
+        verify(productService, times(1)).getProductByBarcode("123");
+    }
+
 }

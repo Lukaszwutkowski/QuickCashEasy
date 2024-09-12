@@ -36,4 +36,16 @@ public class ProductFacade {
     public void deleteProduct(String barcode) {
         productService.deleteProduct(barcode);
     }
+
+    // Return the name of the product given the barcode
+    public String getProductName(String barcode) {
+        Product product = getProductByBarcode(barcode);
+        return product.getName();
+    }
+
+    // Return the price of the product given the barcode
+    public double getProductPrice(String barcode) {
+        Product product = getProductByBarcode(barcode);
+        return product.getPrice();
+    }
 }

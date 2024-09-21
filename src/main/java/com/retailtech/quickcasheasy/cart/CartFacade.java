@@ -1,15 +1,27 @@
 package com.retailtech.quickcasheasy.cart;
 
+import com.retailtech.quickcasheasy.cart.dto.CartItemDTO;
+import com.retailtech.quickcasheasy.product.ProductFacade;
+
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
+/**
+ * Facade for cart-related operations.
+ * Provides a simplified interface to interact with the shopping cart.
+ */
 public class CartFacade {
 
-    private final CartService cartService;
+    private final CartService cartService;  // Corrected type from ProductFacade to CartService
 
-    // Constructor
-    public CartFacade(CartService cartService) {
-        this.cartService = cartService;
+    /**
+     * Constructor initializing the CartService with the provided ProductFacade.
+     *
+     * @param productFacade the product facade to retrieve product information
+     */
+    public CartFacade(ProductFacade productFacade) {
+        this.cartService = new CartService(productFacade);  // Instantiate CartService with ProductFacade
     }
 
     /**
@@ -49,12 +61,17 @@ public class CartFacade {
     }
 
     /**
-     * Get all items in the cart.
+     * Get all items in the cart as DTOs.
      *
-     * @return a list of CartItems
+     * @return a list of CartItemDTOs
      */
-    public List<CartItem> getCartItems() {
-        return cartService.getCartItems();
+    public List<CartItemDTO> getCartItems() {
+        return cartService.getCartItems().stream()
+                .map(item -> new CartItemDTO(
+                        item.getProductName(),
+                        item.getQuantity(),
+                        item.getTotalPrice()))
+                .collect(Collectors.toList());
     }
 
     /**

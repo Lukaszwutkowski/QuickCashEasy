@@ -1,29 +1,46 @@
 package com.retailtech.quickcasheasy.category;
 
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Internal service handling category-related business logic.
+ * This class is package-private.
+ */
 class CategoryService {
 
-    private final CategoryRepository categoryRepository;
+    private final List<Category> categoryList = new ArrayList<>();
 
-    public  CategoryService(CategoryRepository categoryRepository) {
-        this.categoryRepository  = categoryRepository;
+    /**
+     * Adds a new category.
+     *
+     * @param category the Category to add
+     */
+    void addCategory(Category category) {
+        categoryList.add(category);
     }
 
-    public List<Category> getAllCategories() {
-        return categoryRepository.getCategories();
+    /**
+     * Retrieves a category by its ID.
+     *
+     * @param id the ID of the category
+     * @return the Category if found, or null if not found
+     */
+    Category getCategoryById(Long id) {
+        return categoryList.stream()
+                .filter(category -> category.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 
-    public Category getCategoryById(Long id) {
-        return categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found for id: " + id));
+    /**
+     * Retrieves all categories.
+     *
+     * @return a list of all Categories
+     */
+    List<Category> getAllCategories() {
+        return new ArrayList<>(categoryList);
     }
 
-    public void addCategory(Category category) {
-        categoryRepository.save(category);
-    }
-
-    public void deleteCategory(Long id) {
-        categoryRepository.delete(id);
-    }
+    // Additional internal methods can be added here
 }

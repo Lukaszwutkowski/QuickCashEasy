@@ -1,79 +1,130 @@
 package com.retailtech.quickcasheasy.category;
 
+import com.retailtech.quickcasheasy.category.dto.CategoryDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Test class for CategoryFacade.
+ * Focuses on testing the facade's public methods using DTOs.
+ */
 public class CategoryFacadeTest {
 
     private CategoryFacade categoryFacade;
-    private CategoryService categoryService;
 
+    /**
+     * Sets up the test environment before each test.
+     * Initializes the CategoryFacade.
+     */
     @BeforeEach
     void setUp() {
-        categoryService = mock(CategoryService.class);
-        categoryFacade = new CategoryFacade(categoryService);
+        categoryFacade = new CategoryFacade();  // Initialize with real CategoryFacade
     }
 
+    /**
+     * Tests creating and retrieving all categories via the facade.
+     */
     @Test
-    void it_should_return_all_categories_via_facade() {
+    void it_should_create_and_return_all_categories_via_facade() {
         // Given
-        Category category1 = new Category(1L, "Beverages", "Drinks and beverages");
-        Category category2 = new Category(2L, "Snacks", "All types of snacks");
-        when(categoryService.getAllCategories()).thenReturn(List.of(category1, category2));
+        String name1 = "Beverages";
+        String description1 = "Drinks and beverages";
+
+        String name2 = "Snacks";
+        String description2 = "All types of snacks";
 
         // When
-        List<Category> categories = categoryFacade.getAllCategories();
+        categoryFacade.createCategory(1L, name1, description1);
+        categoryFacade.createCategory(2L, name2, description2);
 
         // Then
-        assertNotNull(categories);
-        assertEquals(2, categories.size());
-        assertEquals("Beverages", categories.get(0).getName());
+        List<CategoryDTO> categories = categoryFacade.getAllCategories();
+        assertNotNull(categories, "Categories list should not be null");
+        assertEquals(2, categories.size(), "There should be 2 categories");
 
+        // Verify category details
+        CategoryDTO category1 = categories.stream()
+                .filter(c -> c.getName().equals("Beverages"))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(category1, "Category 'Beverages' should be present");
+        assertEquals(description1, category1.getDescription(), "Descriptions should match");
+
+        CategoryDTO category2 = categories.stream()
+                .filter(c -> c.getName().equals("Snacks"))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(category2, "Category 'Snacks' should be present");
+        assertEquals(description2, category2.getDescription(), "Descriptions should match");
     }
 
+    /**
+     * Tests retrieving a category by its ID via the facade.
+     */
     @Test
     void it_should_return_category_by_id_via_facade() {
         // Given
-        Category category = new Category(1L, "Beverages", "Drinks and beverages");
-        when(categoryService.getCategoryById(1L)).thenReturn(category);
+        categoryFacade.createCategory(1L, "Beverages", "Drinks and beverages");
+        CategoryDTO createdCategory = categoryFacade.getAllCategories().get(0);
+        Long categoryId = createdCategory.getId();
 
         // When
-        Category foundCategory = categoryFacade.getCategoryById(1L);
+        CategoryDTO foundCategory = categoryFacade.getCategoryById(categoryId);
 
         // Then
-        assertNotNull(foundCategory);
-        assertEquals(category, foundCategory);
+        assertNotNull(foundCategory, "Found category should not be null");
+        assertEquals("Beverages", foundCategory.getName(), "Category names should match");
+        assertEquals("Drinks and beverages", foundCategory.getDescription(), "Descriptions should match");
     }
 
+    /**
+     * Tests checking if a category exists via the facade.
+     */
     @Test
-    void it_should_create_category_via_facade() {
+    void it_should_check_if_category_exists_via_facade() {
         // Given
-        String name = "Beverages";
-        String description = "Drinks and beverages";
+        categoryFacade.createCategory(1L,"Snacks", "All types of snacks");
+        CategoryDTO createdCategory = categoryFacade.getAllCategories().get(0);
+        Long categoryId = createdCategory.getId();
 
         // When
-        categoryFacade.createCategory(name, description);
+        boolean exists = categoryFacade.categoryExists(categoryId);
 
         // Then
-        verify(categoryService, times(1)).addCategory(any(Category.class));
+        assertTrue(exists, "Category should exist");
     }
 
+    /**
+     * Tests that 'categoryExists' returns false for a non-existent category ID.
+     */
     @Test
-    void it_should_delete_category_via_facade() {
+    void it_should_return_false_for_nonexistent_category() {
         // Given
-        Long categoryId = 1L;
+        Long nonExistentId = 999L;
 
         // When
-        categoryFacade.deleteCategory(categoryId);
+        boolean exists = categoryFacade.categoryExists(nonExistentId);
 
         // Then
-        verify(categoryService, times(1)).deleteCategory(categoryId);
+        assertFalse(exists, "Category should not exist");
     }
 
+    /**
+     * Tests behavior when retrieving a category that does not exist.
+     */
+    @Test
+    void it_should_return_null_when_category_not_found_by_id() {
+        // Given
+        Long nonExistentId = 999L;
+
+        // When
+        CategoryDTO categoryDTO = categoryFacade.getCategoryById(nonExistentId);
+
+        // Then
+        assertNull(categoryDTO, "CategoryDTO should be null for non-existent ID");
+    }
 }

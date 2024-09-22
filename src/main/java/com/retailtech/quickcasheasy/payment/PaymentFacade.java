@@ -1,54 +1,102 @@
 package com.retailtech.quickcasheasy.payment;
 
-import java.math.BigDecimal;
+import com.retailtech.quickcasheasy.payment.dto.PaymentDTO;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Facade for payment-related operations.
+ * Provides a simplified interface to interact with payments.
+ */
 public class PaymentFacade {
 
     private final PaymentService paymentService;
 
-    // Constructor for PaymentFacade, injecting PaymentService
+    /**
+     * Constructor initializing the PaymentService.
+     */
     public PaymentFacade(PaymentService paymentService) {
         this.paymentService = paymentService;
     }
 
     /**
-     * Processes a payment.
+     * Creates a new payment.
      *
-     * @param paymentType the type of payment (e.g., CASH, CARD)
-     * @param amount the amount of payment
-     * @param totalAmount the total amount that needs to be paid
-     * @return true if the payment is successful, false otherwise
+     * @param amount the amount of the payment
+     * @param method the payment method
+     * @return the created PaymentDTO
      */
-    public boolean processPayment(String paymentType, BigDecimal amount, BigDecimal totalAmount) {
-        // Create a new Payment object
-        Payment payment = new Payment(null, paymentType, amount);
-
-        // Process the payment using the PaymentService
-        paymentService.processPayment(payment, totalAmount);
-
-        // Return whether the payment was successful
-        return payment.isSuccess();
+    public PaymentDTO createPayment(Long id, BigDecimal amount, String method, String status, boolean success) {
+        if (amount == null) {
+            throw new IllegalArgumentException("Amount cannot be null");
+        }
+        if (method == null) {
+            throw new IllegalArgumentException("Payment method cannot be null");
+        }
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+        Payment payment = paymentService.createPayment(id, amount, method, status, success);
+        return mapToDTO(payment);
     }
 
     /**
      * Retrieves a payment by its ID.
      *
-     * @param id the ID of the payment
-     * @return the Payment object
+     * @param paymentId the ID of the payment
+     * @return the PaymentDTO if found, or null if not found
      */
-    public Payment getPaymentById(Long id) {
-        // Get payment by ID from the PaymentService
-        return paymentService.getPaymentById(id);
+    public PaymentDTO getPaymentById(Long paymentId) {
+        Payment payment = paymentService.getPaymentById(paymentId);
+        return (payment != null) ? mapToDTO(payment) : null;
+    }
+
+    /**
+     * Retrieves all payments.
+     *
+     * @return a list of PaymentDTOs
+     */
+    public List<PaymentDTO> getAllPayments() {
+        return paymentService.getAllPayments().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Updates the status and success flag of a payment.
+     *
+     * @param paymentId the ID of the payment
+     * @param status    the new status
+     * @param success   the success flag
+     */
+    public void updatePaymentStatus(Long paymentId, String status, boolean success) {
+        paymentService.updatePaymentStatus(paymentId, status, success);
     }
 
     /**
      * Deletes a payment by its ID.
      *
-     * @param id the ID of the payment to delete
+     * @param paymentId the ID of the payment to delete
      */
-    public void deletePayment(Long id) {
-        // Call the PaymentService to delete the payment
-        paymentService.deletePayment(id);
+    public void deletePayment(Long paymentId) {
+        paymentService.deletePayment(paymentId);
     }
 
+    /**
+     * Private helper method to convert a Payment to a PaymentDTO.
+     *
+     * @param payment the Payment object
+     * @return the corresponding PaymentDTO
+     */
+    private PaymentDTO mapToDTO(Payment payment) {
+        return new PaymentDTO(
+                payment.getId(),
+                payment.getAmount(),
+                payment.getMethod(),
+                payment.getStatus(),
+                payment.isSuccess()
+        );
+    }
 }

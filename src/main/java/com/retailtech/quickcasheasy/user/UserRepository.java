@@ -1,9 +1,9 @@
 package com.retailtech.quickcasheasy.user;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository {
-
     /**
      * Save a user to the repository.
      *
@@ -25,4 +25,11 @@ public interface UserRepository {
      * @param username the username of the user to delete
      */
     void deleteUserByUsername(String username);
+
+    /**
+     * Retrieve all users.
+     *
+     * @return a list of all users
+     */
+    List<User> getAllUsers();
 }

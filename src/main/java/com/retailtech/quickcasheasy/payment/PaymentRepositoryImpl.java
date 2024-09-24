@@ -21,8 +21,9 @@ class PaymentRepositoryImpl implements PaymentRepository {
     private void initializeDatabase() {
         String sql = "CREATE TABLE IF NOT EXISTS payments ("
                 + "id BIGINT AUTO_INCREMENT PRIMARY KEY, "
-                + "payment_type VARCHAR(255), "
+                + "method VARCHAR(255), "
                 + "amount DECIMAL(10,2), "
+                + "status VARCHAR(50), "
                 + "success BOOLEAN)";
         dbUtils.executeUpdate(sql);
     }
@@ -53,8 +54,16 @@ class PaymentRepositoryImpl implements PaymentRepository {
     // Save a payment to the database
     @Override
     public void save(Payment payment) {
-        String sql = "INSERT INTO payments (payment_type, amount, success) VALUES (?, ?, ?)";
-        dbUtils.executeUpdate(sql, payment.getPaymentType(), payment.getAmount(), payment.isSuccess());
+        if (payment.getId() == null) {
+            // Insert new payment
+            String sql = "INSERT INTO payments (method, amount, status, success) VALUES (?, ?, ?, ?)";
+            Long generatedId = dbUtils.executeInsert(sql, payment.getMethod(), payment.getAmount(), payment.getStatus(), payment.isSuccess());
+            payment.setId(generatedId);  // Set the generated ID back to the payment object
+        } else {
+            // Update existing payment
+            String sql = "UPDATE payments SET method = ?, amount = ?, status = ?, success = ? WHERE id = ?";
+            dbUtils.executeUpdate(sql, payment.getMethod(), payment.getAmount(), payment.getStatus(), payment.isSuccess(), payment.getId());
+        }
     }
 
     // Delete a payment by its ID from the database
@@ -62,6 +71,18 @@ class PaymentRepositoryImpl implements PaymentRepository {
     public void delete(Long id) {
         String sql = "DELETE FROM payments WHERE id = ?";
         dbUtils.executeUpdate(sql, id);
+    }
+
+    @Override
+    public boolean existsById(Long id) {
+        String sql = "SELECT 1 FROM payments WHERE id = ?";
+        return dbUtils.executeQuery(sql, rs -> {
+            try {
+                return rs.next();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }, id);
     }
 
     // Helper method to map a result set to a list of payments
@@ -81,8 +102,11 @@ class PaymentRepositoryImpl implements PaymentRepository {
     private Payment mapRowToPayment(ResultSet rs) throws SQLException {
         return new Payment(
                 rs.getLong("id"),
-                rs.getString("payment_type"),
-                rs.getBigDecimal("amount")
+                rs.getBigDecimal("amount"),
+                rs.getString("method"),
+                rs.getString("status"),
+                rs.getBoolean("success")
         );
     }
+
 }

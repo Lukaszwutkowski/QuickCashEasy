@@ -3,7 +3,7 @@ package com.retailtech.quickcasheasy.payment;
 import java.util.List;
 import java.util.Optional;
 
-public interface PaymentRepository {
+interface PaymentRepository {
 
     List<Payment> findAll();
 
@@ -12,4 +12,6 @@ public interface PaymentRepository {
     void save(Payment payment);
 
     void delete(Long id);
+
+    boolean existsById(Long id);
 }

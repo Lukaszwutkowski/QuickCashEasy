@@ -1,5 +1,5 @@
 package com.retailtech.quickcasheasy.user;
 
-enum UserRole {
+public enum UserRole {
     CASHIER, CUSTOMER, ADMIN
 }

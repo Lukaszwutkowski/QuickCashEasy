@@ -1,13 +1,19 @@
 package com.retailtech.quickcasheasy.user;
 
-import java.util.Optional;
+import com.retailtech.quickcasheasy.exception.UserNotFoundException;
 
+import java.util.List;
+
+/**
+ * Internal service handling user business logic.
+ * This class jest public, aby być dostępny dla UserFacade.
+ */
 class UserService {
 
     private final UserRepository userRepository;
 
     // Constructor injecting the repository
-    public UserService(UserRepository userRepository) {
+    UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -18,7 +24,7 @@ class UserService {
      * @param password the password of the user
      * @param role     the role of the user
      */
-    public void registerUser(String username, String password, UserRole role) {
+    void registerUser(String username, String password, UserRole role) {
         if (userRepository.getUserByUsername(username).isPresent()) {
             throw new RuntimeException("User with this username already exists!");
         }
@@ -33,9 +39,10 @@ class UserService {
      * @param password the password of the user
      * @return true if authentication is successful, false otherwise
      */
-    public boolean authenticateUser(String username, String password) {
-        Optional<User> user = userRepository.getUserByUsername(username);
-        return user.isPresent() && user.get().getPassword().equals(password);
+    boolean authenticateUser(String username, String password) {
+        return userRepository.getUserByUsername(username)
+                .map(user -> user.getPassword().equals(password))
+                .orElse(false);
     }
 
     /**
@@ -44,7 +51,7 @@ class UserService {
      * @param username the username of the user
      * @return the user if found, or null if not found
      */
-    public User getUserByUsername(String username) {
+    User getUserByUsername(String username) {
         return userRepository.getUserByUsername(username).orElse(null);
     }
 
@@ -53,7 +60,19 @@ class UserService {
      *
      * @param username the username of the user to delete
      */
-    public void deleteUser(String username) {
+    void deleteUser(String username) {
+        if (!userRepository.getUserByUsername(username).isPresent()) {
+            throw new UserNotFoundException(username);
+        }
         userRepository.deleteUserByUsername(username);
+    }
+
+    /**
+     * Retrieve all users.
+     *
+     * @return a list of all Users
+     */
+    List<User> getAllUsers() {
+        return userRepository.getAllUsers();
     }
 }

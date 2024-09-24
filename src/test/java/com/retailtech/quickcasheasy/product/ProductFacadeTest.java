@@ -1,6 +1,7 @@
 package com.retailtech.quickcasheasy.product;
 
 import com.retailtech.quickcasheasy.category.CategoryFacade;
+import com.retailtech.quickcasheasy.product.dto.ProductDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +31,7 @@ class ProductFacadeTest {
         when(productService.getAllProducts()).thenReturn(List.of(product1, product2));
 
         // When
-        List<Product> products = productFacade.getAllProducts();
+        List<ProductDTO> products = productFacade.getAllProducts();
 
         // Then
         assertNotNull(products);
@@ -45,7 +46,7 @@ class ProductFacadeTest {
         when(productService.getProductByBarcode("barcode1")).thenReturn(product);
 
         // When
-        Product foundProduct = productFacade.getProductByBarcode("barcode1");
+        ProductDTO foundProduct = productFacade.getProductByBarcode("barcode1");
 
         // Then
         assertNotNull(foundProduct);

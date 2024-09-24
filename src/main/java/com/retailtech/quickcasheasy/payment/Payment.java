@@ -2,48 +2,65 @@ package com.retailtech.quickcasheasy.payment;
 
 import java.math.BigDecimal;
 
+/**
+ * Internal representation of a payment.
+ * This class is package-private and not exposed externally.
+ */
 class Payment {
 
-    private Long id;
-    private String paymentType;
+    private Long id;  // Now mutable to accept IDs from the database
     private BigDecimal amount;
+    private String method;
+    private String status;
     private boolean success;
 
-    public Payment(Long id, String paymentType, BigDecimal amount) {
-        this.id = id;
-        this.paymentType = paymentType;
+    // Constructor for new payments (without ID)
+    Payment(BigDecimal amount, String method, String status, boolean success) {
         this.amount = amount;
+        this.method = method;
+        this.status = "PENDING";
+        this.success = false;
     }
 
-    public Long getId() {
+    // Constructor for payments loaded from the database (with ID)
+    Payment(Long id, BigDecimal amount, String method, String status, boolean success) {
+        this.id = id;
+        this.amount = amount;
+        this.method = method;
+        this.status = status;
+        this.success = success;
+    }
+
+    // Getters and Setters
+    Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    void setId(Long id) {
         this.id = id;
     }
 
-    public String getPaymentType() {
-        return paymentType;
-    }
-
-    public void setPaymentType(String paymentType) {
-        this.paymentType = paymentType;
-    }
-
-    public BigDecimal getAmount() {
+    BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
+    String getMethod() {
+        return method;
     }
 
-    public boolean isSuccess() {
+    String getStatus() {
+        return status;
+    }
+
+    void setStatus(String status) {
+        this.status = status;
+    }
+
+    boolean isSuccess() {
         return success;
     }
 
-    public void setSuccess(boolean success) {
+    void setSuccess(boolean success) {
         this.success = success;
     }
 }

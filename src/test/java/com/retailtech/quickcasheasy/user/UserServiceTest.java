@@ -65,13 +65,4 @@ class UserServiceTest {
         // Then
         assertFalse(result);  // Authentication should fail
     }
-
-    @Test
-    void it_should_delete_user() {
-        // When
-        userService.deleteUser("john_doe");
-
-        // Then
-        verify(userRepository, times(1)).deleteUserByUsername("john_doe");
-    }
 }

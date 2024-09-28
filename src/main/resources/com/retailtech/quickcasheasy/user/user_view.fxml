@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+<BorderPane xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.retailtech.quickcasheasy.user.UserController">
+    <center>
+        <TabPane>
+            <!-- Tab Rejestracji -->
+            <Tab text="Rejestracja">
+                <AnchorPane>
+                    <VBox spacing="10" padding="20">
+                        <Label text="Rejestracja Nowego Użytkownika" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                        <TextField fx:id="regUsernameField" promptText="Username"/>
+                        <PasswordField fx:id="regPasswordField" promptText="Password"/>
+                        <ComboBox fx:id="regRoleComboBox" promptText="Select Role">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="CASHIER"/>
+                                    <String fx:value="CUSTOMER"/>
+                                    <String fx:value="ADMIN"/>
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+                        <Button text="Register" onAction="#handleRegister"/>
+                    </VBox>
+                </AnchorPane>
+            </Tab>
+
+            <!-- Tab Logowania -->
+            <Tab text="Logowanie">
+                <AnchorPane>
+                    <VBox spacing="10" padding="20">
+                        <Label text="Logowanie Użytkownika" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                        <TextField fx:id="loginUsernameField" promptText="Username"/>
+                        <PasswordField fx:id="loginPasswordField" promptText="Password"/>
+                        <Button text="Login" onAction="#handleLogin"/>
+                    </VBox>
+                </AnchorPane>
+            </Tab>
+
+            <!-- Tab Zarządzania Użytkownikami (dla ADMIN) -->
+            <Tab text="Zarządzanie Użytkownikami">
+                <AnchorPane>
+                    <VBox spacing="10" padding="20">
+                        <Label text="Lista Użytkowników" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                        <TableView fx:id="userTableView">
+                            <columns>
+                                <TableColumn fx:id="idColumn" text="ID" prefWidth="50"/>
+                                <TableColumn fx:id="usernameColumn" text="Username" prefWidth="150"/>
+                                <TableColumn fx:id="roleColumn" text="Role" prefWidth="100"/>
+                                <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="150"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
+                </AnchorPane>
+            </Tab>
+        </TabPane>
+    </center>
+</BorderPane>

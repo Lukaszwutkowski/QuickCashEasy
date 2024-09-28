@@ -2,7 +2,8 @@ package com.retailtech.quickcasheasy.category;
 
 import com.retailtech.quickcasheasy.database.DatabaseUtils;
 
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

@@ -12,4 +12,6 @@ public interface ProductRepository {
     void save(Product product);
 
     void delete(String barcode);
+
+    boolean existsByBarcode(String barcode);
 }

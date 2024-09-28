@@ -26,7 +26,7 @@ class CartService {
      */
     public void addProductToCart(String barcode, int quantity) {
         String productName = productFacade.getProductName(barcode);  // Get product name from facade
-        BigDecimal productPrice = BigDecimal.valueOf(productFacade.getProductPrice(barcode));  // Get product price from facade
+        BigDecimal productPrice = productFacade.getProductPrice(barcode);  // Get product price directly
 
         if (cartItems.containsKey(barcode)) {
             CartItem existingItem = cartItems.get(barcode);
@@ -36,6 +36,7 @@ class CartService {
             cartItems.put(barcode, newItem);
         }
     }
+
 
     /**
      * Remove a product from the cart

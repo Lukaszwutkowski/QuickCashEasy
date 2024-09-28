@@ -46,6 +46,12 @@ class ProductRepositoryImpl implements ProductRepository {
         dbUtils.executeUpdate(sql, barcode);
     }
 
+    @Override
+    public boolean existsByBarcode(String barcode) {
+        String sql = "SELECT * FROM products WHERE barcode = ?";
+        return dbUtils.executeQuery(sql, this::mapResultSetToOptionalProduct, barcode).isPresent();
+    }
+
     // Helper method to map ResultSet to a list of products
     private List<Product> mapResultSetToProductList(ResultSet rs) {
         List<Product> products = new ArrayList<>();
@@ -73,6 +79,6 @@ class ProductRepositoryImpl implements ProductRepository {
 
     // Helper method to map a row to a Product object
     private Product mapRowToProduct(ResultSet rs) throws SQLException {
-        return new Product(rs.getString("barcode"), rs.getString("name"), rs.getDouble("price"), rs.getLong("category_id"));
+        return new Product(rs.getString("barcode"), rs.getString("name"), rs.getBigDecimal("price"), rs.getLong("category_id"));
     }
 }

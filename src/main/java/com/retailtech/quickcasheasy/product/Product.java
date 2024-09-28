@@ -1,15 +1,15 @@
 package com.retailtech.quickcasheasy.product;
 
-import java.util.Locale;
+import java.math.BigDecimal;
 
 class Product {
 
     private String barcode;
     private String name;
-    private double price;
+    private BigDecimal price;
     private Long categoryId;
 
-    public Product(String barcode, String name, double price, Long categoryId) {
+    public Product(String barcode, String name, BigDecimal price, Long categoryId) {
         this.barcode = barcode;
         this.name = name;
         this.price = price;
@@ -32,12 +32,12 @@ class Product {
         this.name = name;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
     public void setPrice(double price) {
-        this.price = price;
+        this.price = BigDecimal.valueOf(price);
     }
 
     public Long getCategoryId() {

@@ -3,19 +3,31 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<!-- Main layout of the application, using a BorderPane layout -->
 <?import javafx.collections.FXCollections?>
 <?import java.lang.String?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
 <BorderPane xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.retailtech.quickcasheasy.user.UserController">
+
+    <!-- Center the content in the application -->
     <center>
         <TabPane>
-            <!-- Tab Rejestracji -->
-            <Tab text="Rejestracja">
+            <!-- Registration Tab -->
+            <Tab text="Registration">
                 <AnchorPane>
-                    <VBox spacing="10" padding="20">
-                        <Label text="Rejestracja Nowego Użytkownika" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    <!-- VBox for vertically aligning elements, centered in the pane -->
+                    <VBox spacing="10" alignment="CENTER">
+                        <padding>
+                            <Insets top="20" right="20" bottom="20" left="20"/>
+                        </padding>
+                        <!-- Label for registration heading -->
+                        <Label text="Register New User" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                        <!-- Input field for username -->
                         <TextField fx:id="regUsernameField" promptText="Username"/>
+                        <!-- Input field for password -->
                         <PasswordField fx:id="regPasswordField" promptText="Password"/>
+                        <!-- ComboBox for selecting the user role -->
                         <ComboBox fx:id="regRoleComboBox" promptText="Select Role">
                             <items>
                                 <FXCollections fx:factory="observableArrayList">
@@ -25,36 +37,68 @@
                                 </FXCollections>
                             </items>
                         </ComboBox>
+                        <!-- Register button that triggers handleRegister() in the controller -->
                         <Button text="Register" onAction="#handleRegister"/>
                     </VBox>
                 </AnchorPane>
             </Tab>
 
-            <!-- Tab Logowania -->
-            <Tab text="Logowanie">
+            <!-- Login Tab -->
+            <Tab text="Login">
                 <AnchorPane>
-                    <VBox spacing="10" padding="20">
-                        <Label text="Logowanie Użytkownika" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    <!-- VBox for vertically aligning elements, centered in the pane -->
+                    <VBox spacing="10" alignment="CENTER">
+                        <padding>
+                            <Insets top="20" right="20" bottom="20" left="20"/>
+                        </padding>
+                        <!-- Label for login heading -->
+                        <Label text="User Login" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                        <!-- Input field for login username -->
                         <TextField fx:id="loginUsernameField" promptText="Username"/>
+                        <!-- Input field for login password -->
                         <PasswordField fx:id="loginPasswordField" promptText="Password"/>
+                        <!-- Login button that triggers handleLogin() in the controller -->
                         <Button text="Login" onAction="#handleLogin"/>
                     </VBox>
                 </AnchorPane>
             </Tab>
 
-            <!-- Tab Zarządzania Użytkownikami (dla ADMIN) -->
-            <Tab text="Zarządzanie Użytkownikami">
+            <!-- User Management Tab (for ADMIN) -->
+            <Tab text="User Management">
                 <AnchorPane>
-                    <VBox spacing="10" padding="20">
-                        <Label text="Lista Użytkowników" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    <!-- VBox for vertically aligning elements, centered in the pane -->
+                    <VBox spacing="10" alignment="CENTER">
+                        <padding>
+                            <Insets top="20" right="20" bottom="20" left="20"/>
+                        </padding>
+                        <!-- Label for user management heading -->
+                        <Label text="User List" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                        <!-- Table for displaying user details -->
                         <TableView fx:id="userTableView">
                             <columns>
-                                <TableColumn fx:id="idColumn" text="ID" prefWidth="50"/>
-                                <TableColumn fx:id="usernameColumn" text="Username" prefWidth="150"/>
-                                <TableColumn fx:id="roleColumn" text="Role" prefWidth="100"/>
+                                <!-- Użyj 'id' dla kolumny ID (powiązana z getId()) -->
+                                <TableColumn fx:id="idColumn" text="ID" prefWidth="50">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="id"/>
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <!-- Użyj 'userName' dla kolumny Username (powiązana z getUserName()) -->
+                                <TableColumn fx:id="usernameColumn" text="Username" prefWidth="150">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="userName"/>
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <!-- Użyj 'role' dla kolumny Role (powiązana z getRole()) -->
+                                <TableColumn fx:id="roleColumn" text="Role" prefWidth="100">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="role"/>
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <!-- Actions column (no value factory, for buttons) -->
                                 <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="150"/>
                             </columns>
                         </TableView>
+
                     </VBox>
                 </AnchorPane>
             </Tab>

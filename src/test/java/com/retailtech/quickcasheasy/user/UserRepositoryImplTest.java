@@ -77,7 +77,7 @@ class UserRepositoryImplTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             userRepository.saveUser(user);
         });
-        assertEquals("User name cannot be null", exception.getMessage());
+        assertEquals("Username cannot be null", exception.getMessage());
     }
 
     @Test

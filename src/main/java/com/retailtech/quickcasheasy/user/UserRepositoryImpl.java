@@ -1,14 +1,18 @@
 package com.retailtech.quickcasheasy.user;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Implementation of UserRepository using in-memory storage.
  */
 public class UserRepositoryImpl implements UserRepository {
 
-    // In-memory storage for users
-    private final Map<String, User> userStorage = new HashMap<>();
+    // In-memory storage for users (keyed by ID)
+    private final Map<Long, User> userStorageById = new HashMap<>();
+    // Secondary map to allow lookup by username
+    private final Map<String, User> userStorageByUsername = new HashMap<>();
+    private final AtomicLong idGenerator = new AtomicLong(1);
 
     /**
      * Saves a user to the repository.
@@ -21,9 +25,13 @@ public class UserRepositoryImpl implements UserRepository {
             throw new IllegalArgumentException("User cannot be null");
         }
         if (user.getUserName() == null) {
-            throw new IllegalArgumentException("User name cannot be null");
+            throw new IllegalArgumentException("Username cannot be null");
         }
-        userStorage.put(user.getUserName(), user);  // Save user by username
+        if (user.getId() == null) {
+            user.setId(idGenerator.getAndIncrement()); // Assign a unique ID
+        }
+        userStorageById.put(user.getId(), user);  // Save user by ID
+        userStorageByUsername.put(user.getUserName(), user);  // Save user by username
     }
 
     /**
@@ -37,7 +45,7 @@ public class UserRepositoryImpl implements UserRepository {
         if (username == null) {
             return Optional.empty();
         }
-        return Optional.ofNullable(userStorage.get(username));  // Retrieve user by username
+        return Optional.ofNullable(userStorageByUsername.get(username));  // Retrieve user by username
     }
 
     /**
@@ -50,7 +58,10 @@ public class UserRepositoryImpl implements UserRepository {
         if (username == null) {
             throw new IllegalArgumentException("Username cannot be null");
         }
-        userStorage.remove(username);  // Remove user by username
+        User user = userStorageByUsername.remove(username);  // Remove user by username
+        if (user != null) {
+            userStorageById.remove(user.getId());  // Also remove from the ID map
+        }
     }
 
     /**
@@ -60,6 +71,18 @@ public class UserRepositoryImpl implements UserRepository {
      */
     @Override
     public List<User> getAllUsers() {
-        return new ArrayList<>(userStorage.values());  // Return a new list containing all users
+        return new ArrayList<>(userStorageById.values());  // Return a new list containing all users
     }
+
+    /**
+     * Retrieves a user by ID.
+     *
+     * @param id the ID of the user to retrieve
+     * @return an Optional containing the user if found, or empty if not found
+     */
+    @Override
+    public Optional<User> getUserById(Long id) {
+        return Optional.ofNullable(userStorageById.get(id));
+    }
+
 }

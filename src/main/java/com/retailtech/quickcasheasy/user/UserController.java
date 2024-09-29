@@ -5,11 +5,16 @@ import com.retailtech.quickcasheasy.user.dto.UserDTO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -57,10 +62,12 @@ public class UserController {
     // Observable list for table data binding
     private ObservableList<UserDTO> userList;
 
+    // Currently selected user for editing
+    private UserDTO selectedUser;
+
     /**
      * Constructor for UserController.
      * Initializes the UserFacade and the observable list for users.
-     * Note: In JavaFX, it's recommended to initialize such dependencies in the initialize() method.
      */
     public UserController() {
         // Initialization will be moved to the initialize() method
@@ -94,17 +101,17 @@ public class UserController {
     }
 
     /**
-     * Handles the registration of a new user.
-     * Validates input fields and uses the UserFacade to register the user.
+     * Handles the registration or updating of a user.
      */
     @FXML
     private void handleRegister() {
+
         String username = regUsernameField.getText();
         String password = regPasswordField.getText();
         String roleStr = regRoleComboBox.getValue();
 
         // Validate input fields
-        if (username.isEmpty() || password.isEmpty() || roleStr == null) {
+        if (username.isEmpty() || (selectedUser == null && password.isEmpty()) || roleStr == null) {
             showAlert(AlertType.ERROR, "Validation Error", "All fields are required.");
             return;
         }
@@ -117,26 +124,28 @@ public class UserController {
             return;
         }
 
-        try {
-            // Register the user using the facade
-            userFacade.registerUser(username, password, role);
-            showAlert(AlertType.INFORMATION, "Success", "User registered successfully.");
-
-            // Clear input fields
-            regUsernameField.clear();
-            regPasswordField.clear();
-            regRoleComboBox.getSelectionModel().clearSelection();
-
-            // Refresh the user table
-            loadUsers();
-        } catch (Exception e) {
-            showAlert(AlertType.ERROR, "Registration Failed", e.getMessage());
+        if (selectedUser == null) {
+            // Register the user
+            try {
+                userFacade.registerUser(null, username, password, role);
+                showAlert(AlertType.INFORMATION, "Success", "User registered successfully.");
+            } catch (Exception e) {
+                showAlert(AlertType.ERROR, "Registration Failed", e.getMessage());
+            }
+        } else {
+            // Update the user
+            userFacade.updateUser(selectedUser.getId(), username, password.isEmpty() ? selectedUser.getPassword() : password, role);
+            showAlert(AlertType.INFORMATION, "Success", "User updated successfully.");
+            selectedUser = null; // Reset after editing
         }
+
+        // Clear fields and refresh the table
+        clearFields();
+        loadUsers();
     }
 
     /**
      * Handles user login.
-     * Validates input fields and uses the UserFacade to authenticate the user.
      */
     @FXML
     private void handleLogin() {
@@ -152,12 +161,8 @@ public class UserController {
         boolean isAuthenticated = userFacade.authenticateUser(username, password);
         if (isAuthenticated) {
             showAlert(AlertType.INFORMATION, "Success", "Logged in successfully.");
-
-            // Clear input fields
             loginUsernameField.clear();
             loginPasswordField.clear();
-
-            // TODO: Switch view to user or admin panel based on role
         } else {
             showAlert(AlertType.ERROR, "Login Failed", "Invalid login credentials.");
         }
@@ -213,20 +218,42 @@ public class UserController {
 
     /**
      * Handles the editing of a user.
-     * Currently, this functionality is not implemented.
      *
      * @param user The user to edit.
      */
     private void handleEditUser(UserDTO user) {
-        showAlert(AlertType.INFORMATION, "Edit User", "Edit functionality is not implemented yet.");
-        // TODO: Implement user editing functionality
+        if (user.getId() == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+        try {
+            // Load the FXML for the edit user window
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/retailtech/quickcasheasy/user/edit_user_view.fxml"));
+            Parent root = loader.load();
+
+            // Get the controller and pass the selected user data
+            EditUserController controller = loader.getController();
+            controller.setUser(user);
+
+            // Create a new stage for the edit window
+            Stage stage = new Stage();
+            stage.setTitle("Edit User");
+            stage.setScene(new Scene(root));
+            stage.showAndWait();  // Wait for the window to close
+
+            // If the user saved changes, update the user in the facade
+            if (controller.isSaved()) {
+                userFacade.updateUser(user.getId(), user.getUserName(), user.getPassword(), user.getRole());
+                loadUsers();  // Reload users after editing
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
 
     /**
      * Handles the deletion of a user.
-     * Confirms the action with the user before deleting.
-     *
-     * @param user The user to delete.
      */
     private void handleDeleteUser(UserDTO user) {
         Alert confirmation = new Alert(AlertType.CONFIRMATION);
@@ -248,11 +275,16 @@ public class UserController {
     }
 
     /**
+     * Clears the input fields after registering or editing a user.
+     */
+    private void clearFields() {
+        regUsernameField.clear();
+        regPasswordField.clear();
+        regRoleComboBox.getSelectionModel().clearSelection();
+    }
+
+    /**
      * Utility method to display alerts to the user.
-     *
-     * @param type    The type of alert.
-     * @param title   The title of the alert dialog.
-     * @param message The message to display.
      */
     private void showAlert(AlertType type, String title, String message) {
         Alert alert = new Alert(type);

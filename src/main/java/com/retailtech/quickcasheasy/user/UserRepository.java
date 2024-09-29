@@ -32,4 +32,7 @@ public interface UserRepository {
      * @return a list of all users
      */
     List<User> getAllUsers();
+
+    public Optional<User> getUserById(Long id);
+
 }

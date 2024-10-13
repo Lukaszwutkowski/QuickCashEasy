@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.retailtech.quickcasheasy.user.CashierController">
+    <center>
+        <VBox spacing="15" alignment="CENTER">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <!-- Welcome Label -->
+            <Label text="Cashier Dashboard" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+            <!-- Button to start new transaction -->
+            <Button text="Start New Transaction" onAction="#handleNewTransaction"
+                    style="-fx-font-size: 14px; -fx-padding: 10px;"/>
+
+            <!-- Button to view sales history -->
+            <Button text="View Sales History" onAction="#handleViewSalesHistory"
+                    style="-fx-font-size: 14px; -fx-padding: 10px;"/>
+
+            <!-- Button to log out -->
+            <Button text="Logout" onAction="#handleLogout"
+                    style="-fx-font-size: 14px; -fx-padding: 10px;"/>
+        </VBox>
+    </center>
+</BorderPane>

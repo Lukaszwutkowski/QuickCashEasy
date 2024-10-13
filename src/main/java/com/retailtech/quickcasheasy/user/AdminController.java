@@ -21,7 +21,7 @@ import java.util.List;
  * Controller class for handling user-related operations in the JavaFX application.
  * Manages user registration, login, and user management functionalities.
  */
-public class UserController {
+public class AdminController {
 
     // FXML-injected UI components for registration
     @FXML
@@ -32,13 +32,6 @@ public class UserController {
 
     @FXML
     private ComboBox<String> regRoleComboBox;
-
-    // FXML-injected UI components for login
-    @FXML
-    private TextField loginUsernameField;
-
-    @FXML
-    private PasswordField loginPasswordField;
 
     // FXML-injected UI components for user management table
     @FXML
@@ -66,10 +59,10 @@ public class UserController {
     private UserDTO selectedUser;
 
     /**
-     * Constructor for UserController.
+     * Constructor for AdminController.
      * Initializes the UserFacade and the observable list for users.
      */
-    public UserController() {
+    public AdminController() {
         // Initialization will be moved to the initialize() method
     }
 
@@ -144,29 +137,54 @@ public class UserController {
         loadUsers();
     }
 
-    /**
-     * Handles user login.
-     */
+    // Method to manage users, switch to the user management view
     @FXML
-    private void handleLogin() {
-        String username = loginUsernameField.getText();
-        String password = loginPasswordField.getText();
+    private void handleManageUsers() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/retailtech/quickcasheasy/user/user_management_view.fxml"));
+            Parent root = loader.load();
 
-        // Validate input fields
-        if (username.isEmpty() || password.isEmpty()) {
-            showAlert(AlertType.ERROR, "Validation Error", "All fields are required.");
-            return;
-        }
-
-        boolean isAuthenticated = userFacade.authenticateUser(username, password);
-        if (isAuthenticated) {
-            showAlert(AlertType.INFORMATION, "Success", "Logged in successfully.");
-            loginUsernameField.clear();
-            loginPasswordField.clear();
-        } else {
-            showAlert(AlertType.ERROR, "Login Failed", "Invalid login credentials.");
+            Stage stage = (Stage) ((Stage) loader.getController()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Unable to load User Management view.");
         }
     }
+
+    // Method to view reports
+    @FXML
+    private void handleViewReports() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/retailtech/quickcasheasy/reports/reports_view.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) ((Stage) loader.getController()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Unable to load Reports view.");
+        }
+    }
+
+    // Method to log out and return to login screen
+    @FXML
+    private void handleLogout() {
+        try {
+            // Load the FXML for the login view
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/retailtech/quickcasheasy/user/admin_view.fxml"));
+            Parent root = loader.load();
+
+            // Get the current stage using any component from the current scene, such as the userTableView
+            Stage stage = (Stage) userTableView.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Unable to log out.");
+            e.printStackTrace(); // Print stack trace to help with debugging
+        }
+    }
+
 
     /**
      * Loads all users from the database and displays them in the TableView.

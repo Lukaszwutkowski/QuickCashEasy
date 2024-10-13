@@ -8,7 +8,7 @@
 
 <!-- Main layout using BorderPane -->
 <BorderPane xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.retailtech.quickcasheasy.user.UserController">
+            fx:controller="com.retailtech.quickcasheasy.user.AdminController">
 
     <!-- Center content of the layout -->
     <center>
@@ -43,30 +43,11 @@
 
                         <!-- Button to register the user, triggering handleRegister() -->
                         <Button text="Register" onAction="#handleRegister"/>
+
+                        <!-- Logout Button -->
+                        <Button text="Logout" onAction="#handleLogout" style="-fx-font-size: 14px; -fx-padding: 10px;"/>
                     </VBox>
-                </AnchorPane>
-            </Tab>
 
-            <!-- Login Tab -->
-            <Tab text="Login" closable="false">
-                <AnchorPane>
-                    <!-- VBox for vertical alignment of elements -->
-                    <VBox spacing="10" alignment="CENTER">
-                        <padding>
-                            <Insets top="20" right="20" bottom="20" left="20"/>
-                        </padding>
-                        <!-- Label for login form -->
-                        <Label text="User Login" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-
-                        <!-- Input field for login username -->
-                        <TextField fx:id="loginUsernameField" promptText="Username"/>
-
-                        <!-- Input field for login password -->
-                        <PasswordField fx:id="loginPasswordField" promptText="Password"/>
-
-                        <!-- Button to log in the user, triggering handleLogin() -->
-                        <Button text="Login" onAction="#handleLogin"/>
-                    </VBox>
                 </AnchorPane>
             </Tab>
 
@@ -109,6 +90,8 @@
                                 <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="150"/>
                             </columns>
                         </TableView>
+                        <!-- Logout Button -->
+                        <Button text="Logout" onAction="#handleLogout" style="-fx-font-size: 14px; -fx-padding: 10px;"/>
                     </VBox>
                 </AnchorPane>
             </Tab>

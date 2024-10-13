@@ -1,22 +1,47 @@
 package com.retailtech.quickcasheasy.database;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
+/**
+ * Manager for managing database connections.
+ */
 public class DatabaseConnectionManager {
-    private final String url;
-    private final String user;
-    private final String password;
 
-    public DatabaseConnectionManager(String url, String user, String password) {
-        this.url = url;
-        this.user = user;
-        this.password = password;
+    // Database connection details for H2 server mode
+    private static final String JDBC_URL = "jdbc:h2:file:./src/main/resources/QCE";
+    private static final String JDBC_USER = "sa";
+    private static final String JDBC_PASSWORD = "";
+
+    /**
+     * Returns a new instance of the database connection.
+     *
+     * @return The connection to the database.
+     */
+    public static Connection getConnection() {
+        try {
+            // Always create a new connection
+            Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+            connection.setAutoCommit(false); // Setting manual commit to ensure data persistence
+
+            return connection;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error connecting to the database", e);
+        }
     }
 
-    // Method to get a connection
-    public Connection getConnection() throws SQLException, SQLException {
-        return DriverManager.getConnection(url, user, password);
+    /**
+     * Closes the given database connection.
+     *
+     * @param connection The connection to close.
+     */
+    public static void closeConnection(Connection connection) {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

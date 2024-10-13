@@ -10,22 +10,20 @@ import org.h2.tools.RunScript;
 
 public class DatabaseUtils {
 
-    private static final String JDBC_URL = "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;TRACE_LEVEL_FILE=4";
-    private static final String JDBC_USER = "sa";
-    private static final String JDBC_PASSWORD = "";
-
     static {
         try {
             Class.forName("org.h2.Driver");
+            System.out.println("H2 JDBC Driver loaded successfully.");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             throw new RuntimeException("H2 JDBC Driver not found.", e);
         }
     }
 
+
     // Method to execute an insert statement and return the generated key
     public Long executeInsert(String sql, Object... params) {
-        try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+        try (Connection conn = DatabaseConnectionManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             // Set the parameters
@@ -35,6 +33,9 @@ public class DatabaseUtils {
 
             // Execute the insert
             pstmt.executeUpdate();
+
+            // Commit the transaction
+            conn.commit();
 
             // Retrieve the generated key
             try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
@@ -54,7 +55,7 @@ public class DatabaseUtils {
 
     // Existing executeUpdate method
     public void executeUpdate(String sql, Object... params) {
-        try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+        try (Connection conn = DatabaseConnectionManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             // Set the parameters
@@ -65,6 +66,9 @@ public class DatabaseUtils {
             // Execute the update
             pstmt.executeUpdate();
 
+            // Commit the transaction
+            conn.commit();
+
         } catch (SQLException e) {
             // Handle exceptions
             e.printStackTrace();
@@ -74,7 +78,7 @@ public class DatabaseUtils {
 
     // Existing executeQuery method
     public <T> T executeQuery(String sql, ResultSetHandler<T> handler, Object... params) {
-        try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+        try (Connection conn = DatabaseConnectionManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             // Set the parameters
@@ -101,14 +105,18 @@ public class DatabaseUtils {
 
     // New method to execute SQL scripts from the classpath
     public void runScript(String scriptPath) {
-        try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+        try (Connection conn = DatabaseConnectionManager.getConnection();
              InputStream inputStream = getClass().getClassLoader().getResourceAsStream(scriptPath)) {
 
             if (inputStream == null) {
                 throw new RuntimeException("Script file not found: " + scriptPath);
             }
 
+            System.out.println("Successfully found script: " + scriptPath);
             RunScript.execute(conn, new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+            conn.commit();
+
+            System.out.println("Script executed successfully: " + scriptPath);
 
         } catch (SQLException | IOException e) {
             e.printStackTrace();

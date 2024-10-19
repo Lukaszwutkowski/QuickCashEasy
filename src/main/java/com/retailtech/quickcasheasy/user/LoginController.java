@@ -97,21 +97,29 @@ public class LoginController {
      * @param user The logged-in user whose role determines the view to load.
      */
     private void switchToPostLoginView(UserDTO user) {
-        try {
-            FXMLLoader loader;
-            if (user.getRole().equals("ADMIN")) {
-                loader = new FXMLLoader(getClass().getResource("/com/retailtech/quickcasheasy/user/admin_view.fxml"));
-            } else if (user.getRole().equals("CASHIER")) {
-                loader = new FXMLLoader(getClass().getResource("/com/retailtech/quickcasheasy/user/cashier_view.fxml"));
-            } else {
-                loader = new FXMLLoader(getClass().getResource("/com/retailtech/quickcasheasy/user/customer_view.fxml"));
-            }
+        try (Connection connection = DatabaseConnectionManager.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement("SELECT role FROM users WHERE username = ?")) {
+            pstmt.setString(1, user.getUserName());
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                String role = rs.getString("role");
+                FXMLLoader loader;
+                if (role.equals("ADMIN")) {
+                    loader = new FXMLLoader(getClass().getResource("/com/retailtech/quickcasheasy/user/admin_view.fxml"));
+                } else if (role.equals("CASHIER")) {
+                    loader = new FXMLLoader(getClass().getResource("/com/retailtech/quickcasheasy/user/cashier_view.fxml"));
+                } else {
+                    loader = new FXMLLoader(getClass().getResource("/com/retailtech/quickcasheasy/user/customer_view.fxml"));
+                }
 
-            Parent root = loader.load();
-            Stage stage = (Stage) loginUsernameField.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (IOException e) {
+                Parent root = loader.load();
+                Stage stage = (Stage) loginUsernameField.getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.show();
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Error", "User role not found.");
+            }
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Error", "Failed to load the user dashboard.");
         }

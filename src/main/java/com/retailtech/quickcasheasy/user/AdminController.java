@@ -98,7 +98,6 @@ public class AdminController {
      */
     @FXML
     private void handleRegister() {
-
         String username = regUsernameField.getText();
         String password = regPasswordField.getText();
         String roleStr = regRoleComboBox.getValue();
@@ -137,7 +136,9 @@ public class AdminController {
         loadUsers();
     }
 
-    // Method to manage users, switch to the user management view
+    /**
+     * Handles the management of users, switching to the user management view.
+     */
     @FXML
     private void handleManageUsers() {
         try {
@@ -152,7 +153,9 @@ public class AdminController {
         }
     }
 
-    // Method to view reports
+    /**
+     * Handles viewing reports, switching to the reports view.
+     */
     @FXML
     private void handleViewReports() {
         try {
@@ -167,24 +170,23 @@ public class AdminController {
         }
     }
 
-    // Method to log out and return to login screen
+    /**
+     * Handles user logout and returns to the login screen.
+     */
     @FXML
     private void handleLogout() {
         try {
-            // Load the FXML for the login view
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/retailtech/quickcasheasy/user/admin_view.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/retailtech/quickcasheasy/home/home_view.fxml"));
             Parent root = loader.load();
 
-            // Get the current stage using any component from the current scene, such as the userTableView
             Stage stage = (Stage) userTableView.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Error", "Unable to log out.");
-            e.printStackTrace(); // Print stack trace to help with debugging
+            e.printStackTrace();
         }
     }
-
 
     /**
      * Loads all users from the database and displays them in the TableView.
@@ -209,13 +211,11 @@ public class AdminController {
             private final HBox pane = new HBox(5, editButton, deleteButton);
 
             {
-                // Handle Edit button action
                 editButton.setOnAction(event -> {
                     UserDTO user = getTableView().getItems().get(getIndex());
                     handleEditUser(user);
                 });
 
-                // Handle Delete button action
                 deleteButton.setOnAction(event -> {
                     UserDTO user = getTableView().getItems().get(getIndex());
                     handleDeleteUser(user);
@@ -244,24 +244,20 @@ public class AdminController {
             throw new IllegalArgumentException("User ID cannot be null");
         }
         try {
-            // Load the FXML for the edit user window
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/retailtech/quickcasheasy/user/edit_user_view.fxml"));
             Parent root = loader.load();
 
-            // Get the controller and pass the selected user data
             EditUserController controller = loader.getController();
             controller.setUser(user);
 
-            // Create a new stage for the edit window
             Stage stage = new Stage();
             stage.setTitle("Edit User");
             stage.setScene(new Scene(root));
-            stage.showAndWait();  // Wait for the window to close
+            stage.showAndWait();
 
-            // If the user saved changes, update the user in the facade
             if (controller.isSaved()) {
                 userFacade.updateUser(user.getId(), user.getUserName(), user.getPassword(), user.getRole());
-                loadUsers();  // Reload users after editing
+                loadUsers();
             }
 
         } catch (IOException e) {
@@ -269,9 +265,10 @@ public class AdminController {
         }
     }
 
-
     /**
      * Handles the deletion of a user.
+     *
+     * @param user The user to delete.
      */
     private void handleDeleteUser(UserDTO user) {
         Alert confirmation = new Alert(AlertType.CONFIRMATION);
@@ -303,6 +300,10 @@ public class AdminController {
 
     /**
      * Utility method to display alerts to the user.
+     *
+     * @param type    The type of alert (e.g., ERROR, INFORMATION).
+     * @param title   The title of the alert dialog.
+     * @param message The content message of the alert.
      */
     private void showAlert(AlertType type, String title, String message) {
         Alert alert = new Alert(type);

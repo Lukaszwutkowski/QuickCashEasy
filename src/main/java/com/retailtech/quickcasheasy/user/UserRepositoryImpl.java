@@ -20,30 +20,55 @@ public class UserRepositoryImpl implements UserRepository {
      *
      * @param user the user to save
      */
-@Override
-public void saveUser(User user) {
-    if (user == null) {
-        throw new IllegalArgumentException("User cannot be null");
-    }
-    if (user.getUserName() == null) {
-        throw new IllegalArgumentException("Username cannot be null");
+    public void saveUser(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+        if (user.getUserName() == null) {
+            throw new IllegalArgumentException("Username cannot be null");
+        }
+
+        // Check if user already exists
+        Optional<User> existingUser = getUserByUsername(user.getUserName());
+        if (existingUser.isPresent()) {
+            // If user exists, update their details
+            String updateSql = "UPDATE users SET password = ?, role = ? WHERE username = ?";
+            try (Connection connection = DatabaseConnectionManager.getConnection();
+                 PreparedStatement pstmt = connection.prepareStatement(updateSql)) {
+                pstmt.setString(1, user.getPassword());
+                pstmt.setString(2, user.getRole().name());
+                pstmt.setString(3, user.getUserName());
+                pstmt.executeUpdate();
+                connection.commit();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Error updating user: " + e.getMessage(), e);
+            }
+        } else {
+            // If user does not exist, insert a new one
+            String insertSql = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
+            try (Connection connection = DatabaseConnectionManager.getConnection();
+                 PreparedStatement pstmt = connection.prepareStatement(insertSql)) {
+                pstmt.setString(1, user.getUserName());
+                pstmt.setString(2, user.getPassword());
+                pstmt.setString(3, user.getRole().name());
+                pstmt.executeUpdate();
+                connection.commit();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Error saving user: " + e.getMessage(), e);
+            }
+        }
     }
 
-    String sql = "MERGE INTO users (id, username, password, role) VALUES (?, ?, ?, ?)";
-    try (Connection connection = DatabaseConnectionManager.getConnection();
-         PreparedStatement pstmt = connection.prepareStatement(sql)) {
-        pstmt.setLong(1, user.getId() != null ? user.getId() : generateNewId());
-        pstmt.setString(2, user.getUserName());
-        pstmt.setString(3, user.getPassword());
-        pstmt.setString(4, user.getRole().name());
 
-        pstmt.executeUpdate();
-        connection.commit();
-    } catch (SQLException e) {
-        e.printStackTrace();
-        throw new RuntimeException("Error saving user: " + e.getMessage(), e);
-    }
-}
+    /**
+     * Generates a new unique ID for a user using a database sequence.
+     *
+     * This method creates the sequence if it does not exist and retrieves the next value from it.
+     *
+     * @return a new unique ID for a user
+     */
 
     private long generateNewId() {
         String createSequenceSql = "CREATE SEQUENCE IF NOT EXISTS user_sequence START WITH 1 INCREMENT BY 1";

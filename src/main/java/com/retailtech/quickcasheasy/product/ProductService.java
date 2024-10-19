@@ -33,7 +33,7 @@ class ProductService {
      */
     public List<ProductDTO> getAllProducts() {
         // Fetch all products from the repository and map them to ProductDTO
-        return productRepository.findAll().stream()
+        return productRepository.getAllProducts().stream()
                 .map(product -> new ProductDTO(product.getBarcode(), product.getName(), product.getPrice(), product.getCategoryId()))
                 .toList();
     }
@@ -47,7 +47,7 @@ class ProductService {
      */
     public ProductDTO getProductByBarcode(String barcode) {
         // Find a product by its barcode and map it to ProductDTO, throw exception if not found
-        return productRepository.findByBarcode(barcode)
+        return productRepository.getProductByBarcode(barcode)
                 .map(product -> new ProductDTO(product.getBarcode(), product.getName(), product.getPrice(), product.getCategoryId()))
                 .orElseThrow(() -> new RuntimeException("Product not found for barcode: " + barcode));
     }
@@ -71,7 +71,7 @@ class ProductService {
         Product product = new Product(barcode, name, price, categoryId);
 
         // Save the product to the repository
-        productRepository.save(product);
+        productRepository.saveProduct(product);
     }
 
     /**
@@ -81,7 +81,7 @@ class ProductService {
      */
     public void deleteProduct(String barcode) {
         // Delete the product by its barcode using the repository
-        productRepository.delete(barcode);
+        productRepository.deleteProductByBarcode(barcode);
     }
 
     /**

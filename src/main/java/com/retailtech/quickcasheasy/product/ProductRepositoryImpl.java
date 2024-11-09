@@ -1,6 +1,7 @@
 package com.retailtech.quickcasheasy.product;
 
 import com.retailtech.quickcasheasy.database.DatabaseConnectionManager;
+import com.retailtech.quickcasheasy.product.dto.ProductDTO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -52,7 +53,7 @@ public class ProductRepositoryImpl implements ProductRepository {
      * @return an Optional containing the product if found, or empty if not found
      */
     @Override
-    public Optional<Product> getProductByBarcode(String barcode) {
+    public Optional<ProductDTO> getProductByBarcode(String barcode) {
         if (barcode == null) {
             return Optional.empty();
         }
@@ -62,7 +63,7 @@ public class ProductRepositoryImpl implements ProductRepository {
             pstmt.setString(1, barcode);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                Product product = new Product(rs.getString("barcode"), rs.getString("name"), rs.getBigDecimal("price"), rs.getLong("category_id"));
+                ProductDTO product = new ProductDTO(rs.getString("barcode"), rs.getString("name"), rs.getBigDecimal("price"), rs.getLong("category_id"));
                 return Optional.of(product);
             }
         } catch (SQLException e) {
@@ -71,6 +72,7 @@ public class ProductRepositoryImpl implements ProductRepository {
         }
         return Optional.empty();
     }
+
 
     /**
      * Deletes a product by barcode.

@@ -69,6 +69,9 @@ public class CashierController {
 
         // Load cart items into the table
         loadCartItems();
+
+        // Listen for Enter key on barcodeField
+        barcodeField.setOnAction(this::handleAddToCart);
     }
 
     /**

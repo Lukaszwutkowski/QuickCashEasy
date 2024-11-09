@@ -1,6 +1,7 @@
 module com.retailtech.quickcasheasy {
     requires javafx.controls;
     requires javafx.fxml;
+    requires javafx.graphics;
 
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
@@ -10,5 +11,7 @@ module com.retailtech.quickcasheasy {
     requires com.h2database;
 
     opens com.retailtech.quickcasheasy to javafx.fxml;
+    opens com.retailtech.quickcasheasy.user to javafx.fxml;
+    opens com.retailtech.quickcasheasy.user.dto to javafx.base;
     exports com.retailtech.quickcasheasy;
 }

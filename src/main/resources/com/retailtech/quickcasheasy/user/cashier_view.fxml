@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.retailtech.quickcasheasy.user.CashierController">
+    <children>
+        <VBox alignment="TOP_CENTER" spacing="10" AnchorPane.topAnchor="10.0" AnchorPane.bottomAnchor="10.0"
+              AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+            <children>
+                <!-- Header Section -->
+                <Text text="Customer Checkout" style="-fx-font-size: 24px;" />
+
+                <!-- Cart Table Section -->
+                <TableView fx:id="cartTableView">
+                    <columns>
+                        <TableColumn fx:id="productNameColumn" text="Product Name" />
+                        <TableColumn fx:id="quantityColumn" text="Quantity" />
+                        <TableColumn fx:id="totalPriceColumn" text="Total Price" />
+                    </columns>
+                </TableView>
+
+                <!-- Total Price Section -->
+                <HBox alignment="CENTER_RIGHT" spacing="10">
+                    <children>
+                        <Label text="Total Amount:" style="-fx-font-size: 18px;" />
+                        <Text fx:id="totalAmountText" style="-fx-font-size: 18px;" />
+                    </children>
+                </HBox>
+
+                <!-- Buttons Section -->
+                <HBox alignment="CENTER" spacing="10">
+                    <children>
+                        <Label text="Scan Product:" />
+                        <TextField fx:id="barcodeField" promptText="Enter or scan barcode" />
+                        <Button text="Add to Cart" onAction="#handleAddToCart" />
+                        <Button text="Update Account" onAction="#handleUpdateAccount" />
+                        <Button text="Proceed to Payment" onAction="#handleViewCart" />
+                        <Button text="Logout" onAction="#handleLogout" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

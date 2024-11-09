@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+<VBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.retailtech.quickcasheasy.user.EditUserController" alignment="CENTER" spacing="10">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <Label text="Edit User" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+    <TextField fx:id="usernameField" promptText="Username"/>
+    <PasswordField fx:id="passwordField" promptText="Password"/>
+    <ComboBox fx:id="roleComboBox" promptText="Select Role">
+        <items>
+            <FXCollections fx:factory="observableArrayList">
+                <String fx:value="CASHIER"/>
+                <String fx:value="CUSTOMER"/>
+                <String fx:value="ADMIN"/>
+            </FXCollections>
+        </items>
+    </ComboBox>
+
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Save" onAction="#handleSave"/>
+        <Button text="Cancel" onAction="#handleCancel"/>
+    </HBox>
+</VBox>

@@ -1,15 +1,19 @@
 package com.retailtech.quickcasheasy.product;
 
+import com.retailtech.quickcasheasy.product.dto.ProductDTO;
+
 import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository {
 
-    List<Product> findAll();
+    List<Product> getAllProducts();
 
-    Optional<Product> findByBarcode(String barcode);
+    Optional<ProductDTO> getProductByBarcode(String barcode);
 
-    void save(Product product);
+    void saveProduct(Product product);
 
-    void delete(String barcode);
+    void deleteProductByBarcode(String barcode);
+
+    boolean existsByBarcode(String barcode);
 }

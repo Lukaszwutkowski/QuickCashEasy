@@ -26,7 +26,7 @@ class CartFacadeTest {
     void it_should_add_product_to_cart() {
         // Given
         when(productFacade.getProductName("123456")).thenReturn("Apple");
-        when(productFacade.getProductPrice("123456")).thenReturn(1.50);
+        when(productFacade.getProductPrice("123456")).thenReturn(BigDecimal.valueOf(1.50));
 
         // When
         cartFacade.addProductToCart("123456", 2);
@@ -44,7 +44,7 @@ class CartFacadeTest {
     void it_should_remove_product_from_cart() {
         // Given
         when(productFacade.getProductName("123456")).thenReturn("Apple");
-        when(productFacade.getProductPrice("123456")).thenReturn(1.50);
+        when(productFacade.getProductPrice("123456")).thenReturn(BigDecimal.valueOf(1.50));
         cartFacade.addProductToCart("123456", 2);
 
         // When
@@ -59,7 +59,7 @@ class CartFacadeTest {
     void it_should_update_product_quantity_in_cart() {
         // Given
         when(productFacade.getProductName("123456")).thenReturn("Apple");
-        when(productFacade.getProductPrice("123456")).thenReturn(1.50);
+        when(productFacade.getProductPrice("123456")).thenReturn(BigDecimal.valueOf(1.50));
         cartFacade.addProductToCart("123456", 2);
 
         // When
@@ -76,7 +76,7 @@ class CartFacadeTest {
     void it_should_clear_cart() {
         // Given
         when(productFacade.getProductName("123456")).thenReturn("Apple");
-        when(productFacade.getProductPrice("123456")).thenReturn(1.50);
+        when(productFacade.getProductPrice("123456")).thenReturn(BigDecimal.valueOf(1.50));
         cartFacade.addProductToCart("123456", 2);
 
         // When
@@ -93,9 +93,9 @@ class CartFacadeTest {
     void it_should_return_cart_total() {
         // Given
         when(productFacade.getProductName("123456")).thenReturn("Apple");
-        when(productFacade.getProductPrice("123456")).thenReturn(1.50);
+        when(productFacade.getProductPrice("123456")).thenReturn(BigDecimal.valueOf(1.50));
         when(productFacade.getProductName("789101")).thenReturn("Banana");
-        when(productFacade.getProductPrice("789101")).thenReturn(0.75);
+        when(productFacade.getProductPrice("789101")).thenReturn(BigDecimal.valueOf(0.75));
 
         cartFacade.addProductToCart("123456", 2);
         cartFacade.addProductToCart("789101", 3);

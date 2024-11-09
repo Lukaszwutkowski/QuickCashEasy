@@ -28,7 +28,7 @@ public class UserFacade {
      * @param role     the role of the user
      * @return the created UserDTO
      */
-    public UserDTO registerUser(String username, String password, UserRole role) {
+    public UserDTO registerUser(Long id, String username, String password, UserRole role) {
         if (username == null) {
             throw new IllegalArgumentException("Username cannot be null");
         }
@@ -38,7 +38,7 @@ public class UserFacade {
         if (role == null) {
             throw new IllegalArgumentException("User role cannot be null");
         }
-        userService.registerUser(username, password, role);
+        userService.registerUser(id, username, password, role);
         User user = userService.getUserByUsername(username);
         return mapToDTO(user);
     }
@@ -99,4 +99,43 @@ public class UserFacade {
                 user.getRole()
         );
     }
+
+    /**
+     * Updates an existing user.
+     *
+     * @param id       the ID of the user to update
+     * @param username the new username
+     * @param password the new password
+     * @param role     the new role
+     * @throws IllegalArgumentException if any parameter is null or invalid
+     */
+    public void updateUser(Long id, String username, String password, UserRole role) {
+        if (id == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+        if (username == null) {
+            throw new IllegalArgumentException("Username cannot be null");
+        }
+        if (password == null) {
+            throw new IllegalArgumentException("Password cannot be null");
+        }
+        if (role == null) {
+            throw new IllegalArgumentException("User role cannot be null");
+        }
+
+        // Find the existing user by ID
+        User user = userService.getUserByUsername(username);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found for ID: " + id);
+        }
+
+        // Update the user details
+        user.setUserName(username);
+        user.setPassword(password);
+        user.setRole(role);
+
+        // Save the updated user
+        userService.updateUser(user);
+    }
+
 }

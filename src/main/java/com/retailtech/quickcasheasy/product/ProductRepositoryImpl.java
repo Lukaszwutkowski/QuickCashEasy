@@ -1,78 +1,132 @@
 package com.retailtech.quickcasheasy.product;
 
-import com.retailtech.quickcasheasy.database.DatabaseUtils;
+import com.retailtech.quickcasheasy.database.DatabaseConnectionManager;
+import com.retailtech.quickcasheasy.product.dto.ProductDTO;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
-class ProductRepositoryImpl implements ProductRepository {
+/**
+ * Implementation of ProductRepository using a database connection.
+ */
+public class ProductRepositoryImpl implements ProductRepository {
 
-    private final DatabaseUtils dbUtils;
-
-    public ProductRepositoryImpl(DatabaseUtils dbUtils) {
-        this.dbUtils = dbUtils;
-        initializeDatabase();
-    }
-
-    // Initialize the database table if it doesn't exist
-    private void initializeDatabase() {
-        String sql = "CREATE TABLE IF NOT EXISTS products (barcode VARCHAR(255) PRIMARY KEY, name VARCHAR(255), price DOUBLE, category_id BIGINT)";
-        dbUtils.executeUpdate(sql);
-    }
-
+    /**
+     * Saves a product to the repository.
+     *
+     * @param product the product to save
+     */
     @Override
-    public List<Product> findAll() {
-        String sql = "SELECT * FROM products";
-        return dbUtils.executeQuery(sql, this::mapResultSetToProductList);
-    }
-    @Override
-    public Optional<Product> findByBarcode(String barcode) {
-        String sql = "SELECT * FROM products WHERE barcode = ?";
-        return dbUtils.executeQuery(sql, this::mapResultSetToOptionalProduct, barcode);
-    }
-
-    @Override
-    public void save(Product product) {
-        String sql = "INSERT INTO products (barcode, name, price, category_id) VALUES (?, ?, ?, ?)";
-        dbUtils.executeUpdate(sql, product.getBarcode(), product.getName(), product.getPrice(), product.getCategoryId());
-    }
-
-    @Override
-    public void delete(String barcode) {
-        String sql = "DELETE FROM products WHERE barcode = ?";
-        dbUtils.executeUpdate(sql, barcode);
-    }
-
-    // Helper method to map ResultSet to a list of products
-    private List<Product> mapResultSetToProductList(ResultSet rs) {
-        List<Product> products = new ArrayList<>();
-        try {
-            while (rs.next()) {
-                products.add(mapRowToProduct(rs));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error mapping result set to product list", e);
+    public void saveProduct(Product product) {
+        if (product == null) {
+            throw new IllegalArgumentException("Product cannot be null");
         }
-        return products;
+        if (product.getBarcode() == null) {
+            throw new IllegalArgumentException("Barcode cannot be null");
+        }
+
+        String sql = "MERGE INTO products (barcode, name, price, category_id) VALUES (?, ?, ?, ?)";
+        try (Connection connection = DatabaseConnectionManager.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, product.getBarcode());
+            pstmt.setString(2, product.getName());
+            pstmt.setBigDecimal(3, product.getPrice());
+            pstmt.setLong(4, product.getCategoryId());
+
+            pstmt.executeUpdate();
+            connection.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error saving product: " + e.getMessage(), e);
+        }
     }
 
-    // Helper method to map ResultSet to an optional product
-    private Optional<Product> mapResultSetToOptionalProduct(ResultSet rs) {
-        try {
+    /**
+     * Retrieves a product by barcode.
+     *
+     * @param barcode the barcode of the product to retrieve
+     * @return an Optional containing the product if found, or empty if not found
+     */
+    @Override
+    public Optional<ProductDTO> getProductByBarcode(String barcode) {
+        if (barcode == null) {
+            return Optional.empty();
+        }
+        String sql = "SELECT * FROM products WHERE barcode = ?";
+        try (Connection connection = DatabaseConnectionManager.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, barcode);
+            ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                return Optional.of(mapRowToProduct(rs));
+                ProductDTO product = new ProductDTO(rs.getString("barcode"), rs.getString("name"), rs.getBigDecimal("price"), rs.getLong("category_id"));
+                return Optional.of(product);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error mapping result set to optional product", e);
+            e.printStackTrace();
+            throw new RuntimeException("Error retrieving product by barcode: " + e.getMessage(), e);
         }
         return Optional.empty();
     }
 
-    // Helper method to map a row to a Product object
-    private Product mapRowToProduct(ResultSet rs) throws SQLException {
-        return new Product(rs.getString("barcode"), rs.getString("name"), rs.getDouble("price"), rs.getLong("category_id"));
+
+    /**
+     * Deletes a product by barcode.
+     *
+     * @param barcode the barcode of the product to delete
+     */
+    @Override
+    public void deleteProductByBarcode(String barcode) {
+        if (barcode == null) {
+            throw new IllegalArgumentException("Barcode cannot be null");
+        }
+        String sql = "DELETE FROM products WHERE barcode = ?";
+        try (Connection connection = DatabaseConnectionManager.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, barcode);
+            pstmt.executeUpdate();
+            connection.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error deleting product: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Retrieves all products.
+     *
+     * @return a list of all products
+     */
+    @Override
+    public List<Product> getAllProducts() {
+        List<Product> products = new ArrayList<>();
+        String sql = "SELECT * FROM products";
+        try (Connection connection = DatabaseConnectionManager.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                Product product = new Product(rs.getString("barcode"), rs.getString("name"), rs.getBigDecimal("price"), rs.getLong("category_id"));
+                products.add(product);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error retrieving all products: " + e.getMessage(), e);
+        }
+        return products;
+    }
+
+    /**
+     * Checks if a product exists by barcode.
+     *
+     * @param barcode the barcode of the product to check
+     * @return true if the product exists, false otherwise
+     */
+    @Override
+    public boolean existsByBarcode(String barcode) {
+        return getProductByBarcode(barcode).isPresent();
     }
 }

@@ -25,7 +25,7 @@ class UserServiceTest {
         when(userRepository.getUserByUsername("john_doe")).thenReturn(Optional.empty());
 
         // When
-        userService.registerUser("john_doe", "password123", UserRole.CASHIER);
+        userService.registerUser(1L, "john_doe", "password123", UserRole.CASHIER);
 
         // Then
         verify(userRepository, times(1)).saveUser(any(User.class));  // Verify saveUser was called once
@@ -34,10 +34,10 @@ class UserServiceTest {
     @Test
     void it_should_throw_exception_if_user_already_exists() {
         // Given
-        when(userRepository.getUserByUsername("john_doe")).thenReturn(Optional.of(new User(1L, "john_doe", "password123", UserRole.CASHIER)));
+        when(userRepository.getUserById(1L)).thenReturn(Optional.of(new User(1L, "john_doe", "password123", UserRole.CASHIER)));
 
         // When & Then
-        assertThrows(RuntimeException.class, () -> userService.registerUser("john_doe", "password123", UserRole.CASHIER));
+        assertThrows(RuntimeException.class, () -> userService.registerUser(1L, "john_doe", "password123", UserRole.CASHIER));
     }
 
     @Test

@@ -38,10 +38,10 @@ class CartIntegrationTest {
     void it_should_add_items_to_cart_and_calculate_total() {
         // Mock product information returned by the ProductFacade
         when(productFacade.getProductName("123456")).thenReturn("Apple");
-        when(productFacade.getProductPrice("123456")).thenReturn(1.50);
+        when(productFacade.getProductPrice("123456")).thenReturn(BigDecimal.valueOf(1.50));
 
         when(productFacade.getProductName("789101")).thenReturn("Banana");
-        when(productFacade.getProductPrice("789101")).thenReturn(0.75);
+        when(productFacade.getProductPrice("789101")).thenReturn(BigDecimal.valueOf(0.75));
 
         // Use CartFacade to add products to the cart
         cartFacade.addProductToCart("123456", 2);   // Add 2 Apples
@@ -82,7 +82,7 @@ class CartIntegrationTest {
     void it_should_clear_the_cart() {
         // Mock product information returned by the ProductFacade
         when(productFacade.getProductName("123456")).thenReturn("Apple");
-        when(productFacade.getProductPrice("123456")).thenReturn(1.50);
+        when(productFacade.getProductPrice("123456")).thenReturn(BigDecimal.valueOf(1.50));
 
         // Use CartFacade to add a product to the cart
         cartFacade.addProductToCart("123456", 2);   // Add 2 Apples

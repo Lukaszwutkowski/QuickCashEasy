@@ -1,5 +1,7 @@
 package com.retailtech.quickcasheasy.product.dto;
 
+import java.math.BigDecimal;
+
 /**
  * Data Transfer Object for Product information.
  */
@@ -7,10 +9,10 @@ public class ProductDTO {
 
     private final String barcode;
     private final String name;
-    private final double price;
+    private final BigDecimal price;
     private final Long categoryId;
 
-    public ProductDTO(String barcode, String name, double price, Long categoryId) {
+    public ProductDTO(String barcode, String name, BigDecimal price, Long categoryId) {
         this.barcode = barcode;
         this.name = name;
         this.price = price;
@@ -26,7 +28,7 @@ public class ProductDTO {
         return name;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 

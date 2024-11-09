@@ -26,7 +26,7 @@ class CartServiceTest {
     @Test
     void it_should_add_item_to_cart() {
         // Given
-        when(productFacade.getProductPrice("123456")).thenReturn(1.50); // Facade returns price of product
+        when(productFacade.getProductPrice("123456")).thenReturn(BigDecimal.valueOf(1.50)); // Facade returns price of product
         when(productFacade.getProductName("123456")).thenReturn("Apple"); // Facade returns name of product
 
         // When
@@ -42,7 +42,7 @@ class CartServiceTest {
     @Test
     void it_should_remove_item_from_cart() {
         // Given
-        when(productFacade.getProductPrice("123456")).thenReturn(1.50); // Facade returns price of product
+        when(productFacade.getProductPrice("123456")).thenReturn(BigDecimal.valueOf(1.50)); // Facade returns price of product
         when(productFacade.getProductName("123456")).thenReturn("Apple"); // Facade returns name of product
 
         cartService.addProductToCart("123456", 2); // Adding 2 Apples to the cart
@@ -59,7 +59,7 @@ class CartServiceTest {
     @Test
     void it_should_update_quantity_in_cart() {
         // Given
-        when(productFacade.getProductPrice("123456")).thenReturn(1.50); // Facade returns price of product
+        when(productFacade.getProductPrice("123456")).thenReturn(BigDecimal.valueOf(1.50)); // Facade returns price of product
         when(productFacade.getProductName("123456")).thenReturn("Apple"); // Facade returns name of product
 
         cartService.addProductToCart("123456", 2); // Adding 2 Apples to the cart
@@ -76,7 +76,7 @@ class CartServiceTest {
     @Test
     void it_should_clear_the_cart() {
         // Given
-        when(productFacade.getProductPrice("123456")).thenReturn(1.50); // Facade returns price of product
+        when(productFacade.getProductPrice("123456")).thenReturn(BigDecimal.valueOf(1.50)); // Facade returns price of product
         when(productFacade.getProductName("123456")).thenReturn("Apple"); // Facade returns name of product
 
         cartService.addProductToCart("123456", 2); // Adding 2 Apples to the cart

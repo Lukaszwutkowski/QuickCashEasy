@@ -4,10 +4,10 @@ import com.retailtech.quickcasheasy.user.UserRole;
 
 public class UserDTO {
 
-    private final Long id;
-    private final String userName;
-    private final String password;
-    private final UserRole role;
+    private Long id;
+    private String userName;
+    private String password;
+    private UserRole role;
 
     /**
      * Constructor to initialize all fields.
@@ -22,6 +22,11 @@ public class UserDTO {
         this.userName = userName;
         this.password = password;
         this.role = role;
+    }
+
+    public UserDTO(String username, String role) {
+        this.userName = username;
+        this.role = UserRole.valueOf(role);
     }
 
     // Getters
@@ -40,5 +45,21 @@ public class UserDTO {
 
     public UserRole getRole() {
         return role;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
     }
 }

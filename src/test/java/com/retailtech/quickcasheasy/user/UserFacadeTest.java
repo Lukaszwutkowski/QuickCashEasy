@@ -32,17 +32,18 @@ class UserFacadeTest {
     @DisplayName("Should register and return a new user")
     void it_should_register_and_return_user() {
         // Given
+        Long id = 1L;
         String username = "testuser";
         String password = "password123";
         UserRole role = UserRole.CASHIER;
 
         // Mock the behavior: registerUser does not return anything, but getUserByUsername returns the created user
-        doNothing().when(userService).registerUser(username, password, role);
+        doNothing().when(userService).registerUser(id, username, password, role);
         User registeredUser = new User(1L, username, password, role);
         when(userService.getUserByUsername(username)).thenReturn(registeredUser);
 
         // When
-        UserDTO userDTO = userFacade.registerUser(username, password, role);
+        UserDTO userDTO = userFacade.registerUser(id, username, password, role);
 
         // Then
         assertNotNull(userDTO, "UserDTO should not be null");
@@ -51,7 +52,7 @@ class UserFacadeTest {
         assertEquals(password, userDTO.getPassword(), "Password should match");
         assertEquals(role, userDTO.getRole(), "User role should match");
 
-        verify(userService, times(1)).registerUser(username, password, role);
+        verify(userService, times(1)).registerUser(id, username, password, role);
         verify(userService, times(1)).getUserByUsername(username);
     }
 
@@ -62,22 +63,23 @@ class UserFacadeTest {
     @DisplayName("Should throw exception when registering user with existing username")
     void it_should_throw_exception_when_registering_existing_user() {
         // Given
+        Long id = 1L;
         String username = "existinguser";
         String password = "password123";
         UserRole role = UserRole.CASHIER;
 
         // Mock the behavior: registerUser throws RuntimeException when user exists
         doThrow(new RuntimeException("User with this username already exists!"))
-                .when(userService).registerUser(username, password, role);
+                .when(userService).registerUser(id, username, password, role);
 
         // When & Then
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            userFacade.registerUser(username, password, role);
+            userFacade.registerUser(id, username, password, role);
         });
 
         assertEquals("User with this username already exists!", exception.getMessage());
 
-        verify(userService, times(1)).registerUser(username, password, role);
+        verify(userService, times(1)).registerUser(id, username, password, role);
         verify(userService, never()).getUserByUsername(anyString());
     }
 
@@ -88,6 +90,7 @@ class UserFacadeTest {
     @DisplayName("Should throw IllegalArgumentException when registering user with null username")
     void it_should_throw_illegal_argument_exception_when_registering_user_with_null_username() {
         // Given
+        Long id = 1L;
         String username = null;
         String password = "password123";
         UserRole role = UserRole.CASHIER;
@@ -98,12 +101,12 @@ class UserFacadeTest {
 
         // When & Then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            userFacade.registerUser(username, password, role);
+            userFacade.registerUser(id, username, password, role);
         });
 
         assertEquals("Username cannot be null", exception.getMessage());
 
-        verify(userService, never()).registerUser(anyString(), anyString(), any());
+        verify(userService, never()).registerUser(anyLong(), anyString(), anyString(), any());
         verify(userService, never()).getUserByUsername(anyString());
     }
 
@@ -114,6 +117,7 @@ class UserFacadeTest {
     @DisplayName("Should throw IllegalArgumentException when registering user with null password")
     void it_should_throw_illegal_argument_exception_when_registering_user_with_null_password() {
         // Given
+        Long id = 1L;
         String username = "testuser";
         String password = null;
         UserRole role = UserRole.CASHIER;
@@ -124,12 +128,12 @@ class UserFacadeTest {
 
         // When & Then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            userFacade.registerUser(username, password, role);
+            userFacade.registerUser(id, username, password, role);
         });
 
         assertEquals("Password cannot be null", exception.getMessage());
 
-        verify(userService, never()).registerUser(anyString(), anyString(), any());
+        verify(userService, never()).registerUser(anyLong(), anyString(), anyString(), any());
         verify(userService, never()).getUserByUsername(anyString());
     }
 
@@ -140,6 +144,7 @@ class UserFacadeTest {
     @DisplayName("Should throw IllegalArgumentException when registering user with null role")
     void it_should_throw_illegal_argument_exception_when_registering_user_with_null_role() {
         // Given
+        Long id = 1L;
         String username = "testuser";
         String password = "password123";
         UserRole role = null;
@@ -150,12 +155,12 @@ class UserFacadeTest {
 
         // When & Then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            userFacade.registerUser(username, password, role);
+            userFacade.registerUser(id, username, password, role);
         });
 
         assertEquals("User role cannot be null", exception.getMessage());
 
-        verify(userService, never()).registerUser(anyString(), anyString(), any());
+        verify(userService, never()).registerUser(anyLong(), anyString(), anyString(), any());
         verify(userService, never()).getUserByUsername(anyString());
     }
 

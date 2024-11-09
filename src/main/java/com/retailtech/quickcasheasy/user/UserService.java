@@ -24,8 +24,8 @@ class UserService {
      * @param password the password of the user
      * @param role     the role of the user
      */
-    void registerUser(String username, String password, UserRole role) {
-        if (userRepository.getUserByUsername(username).isPresent()) {
+    void registerUser(Long id, String username, String password, UserRole role) {
+        if (userRepository.getUserById(id).isPresent()) {
             throw new RuntimeException("User with this username already exists!");
         }
         User newUser = new User(null, username, password, role);
@@ -75,4 +75,21 @@ class UserService {
     List<User> getAllUsers() {
         return userRepository.getAllUsers();
     }
+
+    /**
+     * Update an existing user.
+     * If the user does not exist, an exception is thrown.
+     *
+     * @param user the user object with updated details
+     */
+    public void updateUser(User user) {
+        // Check if the user exists
+        if (user.getId() == null || userRepository.getUserById(user.getId()).isEmpty()) {
+            throw new UserNotFoundException("User not found for ID: " + user.getId());
+        }
+
+        // Save the updated user to the repository
+        userRepository.saveUser(user);
+    }
+
 }

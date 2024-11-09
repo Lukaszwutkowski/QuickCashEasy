@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.retailtech.quickcasheasy.user.LoginController">
+
+    <!-- Top section with logo and welcome message -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #FF5757; -fx-padding: 10px;">
+            <!-- Logo Image -->
+            <ImageView fitHeight="150" fitWidth="150">
+                <image>
+                    <Image url="@../resources/QuickCash.png" />
+                </image>
+            </ImageView>
+            <!-- Welcome Label -->
+            <Label text="Welcome to QuickCashEasy" style="-fx-font-size: 24px; -fx-text-fill: white; -fx-font-weight: bold;"/>
+        </HBox>
+    </top>
+
+    <!-- Center content of the layout -->
+    <center>
+        <VBox spacing="15" alignment="CENTER" style="-fx-padding: 40; -fx-background-color: #F0F8FF;">
+            <!-- Label for login form -->
+            <Label text="User Login" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+            <!-- Input field for login username -->
+            <TextField fx:id="loginUsernameField" promptText="Enter your username"/>
+
+            <!-- Input field for login password -->
+            <PasswordField fx:id="loginPasswordField" promptText="Enter your password"/>
+
+            <!-- Button to log in the user, triggering handleLogin() -->
+            <Button text="Login" onAction="#handleLogin" style="-fx-font-size: 16px; -fx-padding: 10px 20px; -fx-background-color: #FF5757; -fx-text-fill: white;"/>
+        </VBox>
+    </center>
+</BorderPane>

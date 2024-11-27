@@ -9,6 +9,7 @@ module com.retailtech.quickcasheasy {
     requires org.kordamp.bootstrapfx.core;
     requires java.sql;
     requires com.h2database;
+    requires java.net.http;
 
     opens com.retailtech.quickcasheasy to javafx.fxml;
     opens com.retailtech.quickcasheasy.user to javafx.fxml;

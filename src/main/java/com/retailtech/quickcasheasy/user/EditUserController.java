@@ -24,6 +24,10 @@ public class EditUserController {
      * Initialize the fields with the selected user's information.
      */
     public void setUser(UserDTO user) {
+        if (user == null) {
+            System.err.println("UserDTO provided to EditUserController is null!");
+            return;
+        }
         this.user = user;
         usernameField.setText(user.getUserName());
         roleComboBox.setValue(user.getRole().toString());
@@ -43,6 +47,12 @@ public class EditUserController {
      */
     @FXML
     private void handleSave() {
+
+        if (user == null) {
+            System.err.println("Attempting to save, but user is null in EditUserController.");
+            return;
+        }
+
         // Update the user object with new values
         user.setUserName(usernameField.getText());
         user.setPassword(passwordField.getText());
@@ -64,5 +74,9 @@ public class EditUserController {
         // Close the window without saving
         Stage stage = (Stage) usernameField.getScene().getWindow();
         stage.close();
+    }
+
+    public UserDTO getUser() {
+        return user;
     }
 }

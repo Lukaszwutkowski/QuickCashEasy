@@ -5,20 +5,13 @@ CREATE TABLE IF NOT EXISTS users (
                                      role VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS products (
-                                        barcode VARCHAR(255) PRIMARY KEY,
-                                        name VARCHAR(255) NOT NULL,
-                                        price DECIMAL(10, 2) NOT NULL,
-                                        category_id BIGINT
-);
-
 CREATE TABLE IF NOT EXISTS category (
                                         id BIGINT AUTO_INCREMENT PRIMARY KEY,   -- Unique category ID, auto-incremented
                                         name VARCHAR(255) NOT NULL,             -- Category name
                                         description VARCHAR(500)                -- Category description (optional field)
 );
 
-CREATE TABLE IF NOT EXISTS product (
+CREATE TABLE IF NOT EXISTS products (
                                        barcode VARCHAR(50) PRIMARY KEY,        -- Unique product barcode
                                        name VARCHAR(255) NOT NULL,             -- Product name
                                        price DECIMAL(15, 2) NOT NULL,          -- Product price

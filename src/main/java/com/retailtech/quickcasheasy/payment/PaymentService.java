@@ -3,6 +3,7 @@ package com.retailtech.quickcasheasy.payment;
 import com.retailtech.quickcasheasy.database.DatabaseUtils;
 import com.retailtech.quickcasheasy.exception.PaymentNotFoundException;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -13,9 +14,11 @@ import java.util.List;
 class PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final BankPaymentClient bankPaymentClient;
 
     PaymentService() {
         this.paymentRepository = new PaymentRepositoryImpl(new DatabaseUtils());
+        this.bankPaymentClient = new BankPaymentClient();
     }
 
     /**
@@ -82,4 +85,30 @@ class PaymentService {
             throw new PaymentNotFoundException(paymentId);
         }
     }
+
+    /**
+     * Initiates an external payment by calling the bank's API and saving the transaction locally.
+     *
+     * @param id          the ID of the transaction
+     * @param amount      the amount to be paid
+     * @param method      the payment method
+     * @param cardNumber  the card number associated with the primary account to debit
+     * @return the response from the bank's API
+     * @throws RuntimeException if there is an error processing the payment
+     */
+    String initiateExternalPayment(Long id, BigDecimal amount, String method, int cardNumber) {
+        try {
+            // Call the bank API with the card number and amount
+            String response = bankPaymentClient.makeBankPayment(cardNumber, amount);
+
+            // Create and save the local transaction
+            Payment payment = new Payment(id, amount, method, "Completed", true);
+            paymentRepository.save(payment);
+
+            return response; // Return the response from the bank system
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Failed to process payment", e);
+        }
+    }
+
 }

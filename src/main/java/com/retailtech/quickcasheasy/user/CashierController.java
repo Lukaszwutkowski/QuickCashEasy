@@ -1,6 +1,7 @@
 package com.retailtech.quickcasheasy.user;
 
 import com.retailtech.quickcasheasy.cart.dto.CartItemDTO;
+import com.retailtech.quickcasheasy.payment.PaymentController;
 import com.retailtech.quickcasheasy.product.ProductRepositoryImpl;
 import com.retailtech.quickcasheasy.product.dto.ProductDTO;
 import com.retailtech.quickcasheasy.user.dto.UserDTO;
@@ -97,6 +98,48 @@ public class CashierController {
     }
 
     /**
+     * Handles the action of proceeding to the payment screen.
+     * Opens a new window for payment, passing the total amount to be paid.
+     */
+    @FXML
+    private void handleProceedToPayment(ActionEvent actionEvent) {
+        try {
+            // Load the payment window FXML
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/retailtech/quickcasheasy/payment/payment_view.fxml"));
+            Parent root = loader.load();
+
+            // Get the controller for the payment window
+            PaymentController paymentController = loader.getController();
+
+            // Calculate total amount from the cart items
+            BigDecimal totalAmount = calculateTotalAmount();
+            paymentController.setAmountToPay(totalAmount);  // Pass total amount to payment controller
+
+            // Set up the stage for the payment window
+            Stage stage = new Stage();
+            stage.setTitle("Payment");
+            stage.setScene(new Scene(root));
+            stage.showAndWait();  // Wait for the payment window to close before returning
+
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load the Payment window.");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Calculates the total amount based on items in the cart.
+     *
+     * @return The total amount as BigDecimal.
+     */
+    private BigDecimal calculateTotalAmount() {
+        return cartItemList.stream()
+                .map(CartItemDTO::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+
+    /**
      * Handles adding a product to the cart by scanning the barcode.
      */
     @FXML
@@ -140,29 +183,47 @@ public class CashierController {
 
     /**
      * Handles updating the account information of the logged-in customer.
+     * Opens a new window to allow the user to edit their account details.
+     * If the user saves the changes, the loggedInUser object is updated.
+     *
+     * @param actionEvent the ActionEvent triggered by the button click
      */
     @FXML
     private void handleUpdateAccount(ActionEvent actionEvent) {
+        if (loggedInUser == null) {
+            System.err.println("Error: loggedInUser is null before setting in EditUserController.");
+            return; // Handle the error or set a default user if needed
+        }
+
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/retailtech/quickcasheasy/user/update_account_view.fxml"));
+            // Load the FXML file for the edit user view
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/retailtech/quickcasheasy/user/edit_user_view.fxml"));
             Parent root = loader.load();
 
-            UpdateAccountController controller = loader.getController();
+            // Get the controller from the FXML loader and set the logged-in user
+            EditUserController controller = loader.getController();
             controller.setUser(loggedInUser);
 
+            // Create a new stage for the edit user window
             Stage stage = new Stage();
             stage.setTitle("Update Account");
             stage.setScene(new Scene(root));
             stage.showAndWait();
 
-            if (controller.isUpdated()) {
-                loggedInUser = controller.getUpdatedUser();
+            // Check if changes were saved in the EditUserController
+            if (controller.isSaved()) {
+                // Retrieve updated user information
+                loggedInUser = controller.getUser();
                 showAlert(Alert.AlertType.INFORMATION, "Success", "Account updated successfully.");
             }
+
         } catch (IOException e) {
+            // Display an error alert if the view could not be loaded
             showAlert(Alert.AlertType.ERROR, "Error", "Failed to load the Update Account view.");
+            e.printStackTrace();
         }
     }
+
 
     /**
      * Handles user logout and returns to the login screen.

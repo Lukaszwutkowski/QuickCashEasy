@@ -99,4 +99,24 @@ public class PaymentFacade {
                 payment.isSuccess()
         );
     }
+
+    /**
+     * Processes a payment by validating inputs and initiating an external payment.
+     *
+     * @param id            the ID of the transaction
+     * @param amount        the amount to be paid
+     * @param method        the payment method
+     * @param cardNumber the card number associated with the primary account to debit
+     * @return the response from the bank's API
+     * @throws IllegalArgumentException if any required parameter is invalid
+     */
+    public String processPayment(Long id, BigDecimal amount, String method, int cardNumber){
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0){
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+        if (method == null || cardNumber <= 0) {
+            throw new IllegalArgumentException("Payment method, account type, and account number cannot be null");
+        }
+        return paymentService.initiateExternalPayment(id, amount, method, cardNumber);
+    }
 }

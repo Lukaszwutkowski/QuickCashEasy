@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.retailtech.quickcasheasy.payment.PaymentController">
+    <children>
+        <VBox alignment="TOP_CENTER" spacing="10" AnchorPane.topAnchor="10.0" AnchorPane.bottomAnchor="10.0"
+              AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+            <children>
+                <!-- Header Section -->
+                <Text text="Payment" style="-fx-font-size: 24px;" />
+
+                <!-- Amount Section -->
+                <HBox alignment="CENTER" spacing="10">
+                    <Label text="Total Amount:" style="-fx-font-size: 18px;" />
+                    <Label fx:id="totalAmountLabel" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+                </HBox>
+
+                <!-- Card Number Input Section -->
+                <HBox alignment="CENTER" spacing="10">
+                    <Label text="Card Number:" />
+                    <TextField fx:id="cardNumberField" promptText="Enter or scan card number" />
+                </HBox>
+
+                <!-- Payment Button -->
+                <Button text="Pay Now" onAction="#handlePayment" />
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

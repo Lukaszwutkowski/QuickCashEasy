@@ -37,7 +37,7 @@
                         <TextField fx:id="barcodeField" promptText="Enter or scan barcode" />
                         <Button text="Add to Cart" onAction="#handleAddToCart" />
                         <Button text="Update Account" onAction="#handleUpdateAccount" />
-                        <Button text="Proceed to Payment" onAction="#handleViewCart" />
+                        <Button text="Proceed to Payment" onAction="#handleProceedToPayment" />
                         <Button text="Logout" onAction="#handleLogout" />
                     </children>
                 </HBox>

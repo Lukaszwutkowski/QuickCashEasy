@@ -7,26 +7,23 @@ import java.sql.*;
  */
 public class DatabaseConnectionManager {
 
-    // Database connection details for H2 server mode
-    private static final String JDBC_URL = "jdbc:h2:file:./src/main/resources/QCE";
-    private static final String JDBC_USER = "sa";
-    private static final String JDBC_PASSWORD = "";
-
+    // SQLite database connection details
+    private static final String JDBC_URL = "jdbc:sqlite:QCE.db";
     /**
      * Returns a new instance of the database connection.
      *
-     * @return The connection to the database.
+     * @return The connection to the SQLite database.
      */
     public static Connection getConnection() {
         try {
             // Always create a new connection
-            Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+            Connection connection = DriverManager.getConnection(JDBC_URL);
             connection.setAutoCommit(false); // Setting manual commit to ensure data persistence
 
             return connection;
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException("Error connecting to the database", e);
+            throw new RuntimeException("Error connecting to the SQLite database", e);
         }
     }
 

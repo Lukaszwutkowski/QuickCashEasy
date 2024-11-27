@@ -14,6 +14,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -26,7 +27,9 @@ import java.util.Optional;
  */
 public class CashierController {
 
-    // FXML-injected UI components for cart management
+    @FXML
+    private Text totalAmountText;
+
     @FXML
     private TableView<CartItemDTO> cartTableView;
 
@@ -67,6 +70,19 @@ public class CashierController {
         productNameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
         quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         totalPriceColumn.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
+
+        // Add custom cell factory for formatting BigDecimal in totalPriceColumn
+        totalPriceColumn.setCellFactory(column -> new TableCell<CartItemDTO, BigDecimal>() {
+            @Override
+            protected void updateItem(BigDecimal item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + " NOK");
+                }
+            }
+        });
 
         // Load cart items into the table
         loadCartItems();
@@ -133,11 +149,15 @@ public class CashierController {
      * @return The total amount as BigDecimal.
      */
     private BigDecimal calculateTotalAmount() {
-        return cartItemList.stream()
+        BigDecimal total = cartItemList.stream()
                 .map(CartItemDTO::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
 
+        // Update the totalAmountText in the UI
+        totalAmountText.setText(total.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + " NOK");
+
+        return total;
+    }
 
     /**
      * Handles adding a product to the cart by scanning the barcode.
@@ -175,6 +195,7 @@ public class CashierController {
 
             cartTableView.refresh();
             barcodeField.clear();
+            calculateTotalAmount();
 
         } else {
             showAlert(Alert.AlertType.ERROR, "Error", "Product not found.");

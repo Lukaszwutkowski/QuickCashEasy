@@ -1,27 +1,35 @@
 package com.retailtech.quickcasheasy.database;
 
+import org.h2.tools.RunScript;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 
-import org.h2.tools.RunScript;
-
+/**
+ * Utility class for performing database operations.
+ */
 public class DatabaseUtils {
 
     static {
         try {
-            Class.forName("org.h2.Driver");
-            System.out.println("H2 JDBC Driver loaded successfully.");
+            Class.forName("org.sqlite.JDBC");
+            System.out.println("SQLite JDBC Driver loaded successfully.");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            throw new RuntimeException("H2 JDBC Driver not found.", e);
+            throw new RuntimeException("SQLite JDBC Driver not found.", e);
         }
     }
 
-
-    // Method to execute an insert statement and return the generated key
+    /**
+     * Executes an insert statement and returns the generated key.
+     *
+     * @param sql    The SQL insert statement.
+     * @param params Parameters for the SQL statement.
+     * @return The generated key.
+     */
     public Long executeInsert(String sql, Object... params) {
         try (Connection conn = DatabaseConnectionManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -42,18 +50,22 @@ public class DatabaseUtils {
                 if (generatedKeys.next()) {
                     return generatedKeys.getLong(1);
                 } else {
-                    throw new SQLException("Inserting payment failed, no ID obtained.");
+                    throw new SQLException("Inserting record failed, no ID obtained.");
                 }
             }
 
         } catch (SQLException e) {
-            // Handle exceptions (you can customize this)
             e.printStackTrace();
             throw new RuntimeException("Error executing insert: " + e.getMessage(), e);
         }
     }
 
-    // Existing executeUpdate method
+    /**
+     * Executes an update statement.
+     *
+     * @param sql    The SQL update statement.
+     * @param params Parameters for the SQL statement.
+     */
     public void executeUpdate(String sql, Object... params) {
         try (Connection conn = DatabaseConnectionManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -70,13 +82,20 @@ public class DatabaseUtils {
             conn.commit();
 
         } catch (SQLException e) {
-            // Handle exceptions
             e.printStackTrace();
             throw new RuntimeException("Error executing update: " + e.getMessage(), e);
         }
     }
 
-    // Existing executeQuery method
+    /**
+     * Executes a query and processes the result set using the provided handler.
+     *
+     * @param sql     The SQL query statement.
+     * @param handler A handler to process the ResultSet.
+     * @param params  Parameters for the SQL statement.
+     * @param <T>     The type of the result returned by the handler.
+     * @return The result processed by the handler.
+     */
     public <T> T executeQuery(String sql, ResultSetHandler<T> handler, Object... params) {
         try (Connection conn = DatabaseConnectionManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -92,18 +111,16 @@ public class DatabaseUtils {
             }
 
         } catch (SQLException e) {
-            // Handle exceptions
             e.printStackTrace();
             throw new RuntimeException("Error executing query: " + e.getMessage(), e);
         }
     }
 
-    // Interface for handling ResultSet
-    public interface ResultSetHandler<T> {
-        T handle(ResultSet rs) throws SQLException;
-    }
-
-    // New method to execute SQL scripts from the classpath
+    /**
+     * Executes a SQL script from the classpath.
+     *
+     * @param scriptPath The path to the script file.
+     */
     public void runScript(String scriptPath) {
         try (Connection conn = DatabaseConnectionManager.getConnection();
              InputStream inputStream = getClass().getClassLoader().getResourceAsStream(scriptPath)) {
@@ -112,7 +129,7 @@ public class DatabaseUtils {
                 throw new RuntimeException("Script file not found: " + scriptPath);
             }
 
-            System.out.println("Successfully found script: " + scriptPath);
+            System.out.println("Executing script: " + scriptPath);
             RunScript.execute(conn, new InputStreamReader(inputStream, StandardCharsets.UTF_8));
             conn.commit();
 
@@ -122,5 +139,15 @@ public class DatabaseUtils {
             e.printStackTrace();
             throw new RuntimeException("Error running script: " + e.getMessage(), e);
         }
+    }
+
+
+    /**
+     * Interface for handling ResultSet processing.
+     *
+     * @param <T> The type of the result.
+     */
+    public interface ResultSetHandler<T> {
+        T handle(ResultSet rs) throws SQLException;
     }
 }

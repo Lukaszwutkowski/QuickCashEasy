@@ -14,5 +14,7 @@ module com.retailtech.quickcasheasy {
     opens com.retailtech.quickcasheasy to javafx.fxml;
     opens com.retailtech.quickcasheasy.user to javafx.fxml;
     opens com.retailtech.quickcasheasy.user.dto to javafx.base;
+    opens com.retailtech.quickcasheasy.cart.dto to javafx.base;
+
     exports com.retailtech.quickcasheasy;
 }

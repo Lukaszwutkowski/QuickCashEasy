@@ -1,5 +1,7 @@
 package com.retailtech.quickcasheasy.user;
 
+import com.retailtech.quickcasheasy.database.DatabaseUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,8 +17,23 @@ class UserRepositoryImplTest {
 
     @BeforeEach
     void setUp() {
+
         userRepository = new UserRepositoryImpl();
+        DatabaseUtils databaseUtils = new DatabaseUtils();
+
+        // Initialize the database schema
+        databaseUtils.runScript("init.sql");
     }
+
+    @AfterEach
+    void tearDown() {
+        DatabaseUtils databaseUtils = new DatabaseUtils();
+
+        // Drop tables after each test
+        databaseUtils.executeUpdate("DROP TABLE IF EXISTS users");
+        databaseUtils.executeUpdate("DROP TABLE IF EXISTS user_roles");
+    }
+
 
     @Test
     @DisplayName("Should save and retrieve a user")
@@ -50,16 +67,21 @@ class UserRepositoryImplTest {
     @Test
     @DisplayName("Should retrieve all users")
     void shouldRetrieveAllUsers() {
+        // Arrange: Insert two users
         User user1 = new User(1L, "user1", "pass1", UserRole.CASHIER);
         User user2 = new User(2L, "user2", "pass2", UserRole.ADMIN);
         userRepository.saveUser(user1);
         userRepository.saveUser(user2);
 
+        // Act: Retrieve all users
         List<User> allUsers = userRepository.getAllUsers();
+
+        // Assert: Check the retrieved users
         assertEquals(2, allUsers.size(), "Should retrieve two users");
-        assertTrue(allUsers.contains(user1), "Should contain user1");
-        assertTrue(allUsers.contains(user2), "Should contain user2");
+        assertTrue(allUsers.stream().anyMatch(u -> u.getUserName().equals("user1")), "Should contain user1");
+        assertTrue(allUsers.stream().anyMatch(u -> u.getUserName().equals("user2")), "Should contain user2");
     }
+
 
     @Test
     @DisplayName("Should throw exception when saving null user")

@@ -120,28 +120,32 @@ public class CashierController {
     @FXML
     private void handleProceedToPayment(ActionEvent actionEvent) {
         try {
-            // Load the payment window FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/retailtech/quickcasheasy/payment/payment_view.fxml"));
             Parent root = loader.load();
 
-            // Get the controller for the payment window
+            // Get the PaymentController instance
             PaymentController paymentController = loader.getController();
 
-            // Calculate total amount from the cart items
+            // Calculate total amount and set it in PaymentController
             BigDecimal totalAmount = calculateTotalAmount();
-            paymentController.setAmountToPay(totalAmount);  // Pass total amount to payment controller
+            paymentController.setAmountToPay(totalAmount);
 
-            // Set up the stage for the payment window
+            // Pass this CashierController to PaymentController
+            paymentController.setCashierController(this);
+
+            // Open the payment window
             Stage stage = new Stage();
             stage.setTitle("Payment");
             stage.setScene(new Scene(root));
-            stage.showAndWait();  // Wait for the payment window to close before returning
+            stage.showAndWait();
 
+            System.out.println("Payment window closed.");
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Error", "Failed to load the Payment window.");
             e.printStackTrace();
         }
     }
+
 
     /**
      * Calculates the total amount based on items in the cart.
@@ -263,6 +267,18 @@ public class CashierController {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Clears the cart and updates the UI.
+     */
+    public void clearCart() {
+        System.out.println("Clearing the cart...");
+        cartItemList.clear();
+        cartTableView.refresh();
+        calculateTotalAmount();
+        System.out.println("Cart cleared successfully.");
+    }
+
 
     /**
      * Utility method to display alerts to the user.

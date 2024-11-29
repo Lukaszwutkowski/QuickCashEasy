@@ -1,10 +1,12 @@
 package com.retailtech.quickcasheasy.payment;
 
+import com.retailtech.quickcasheasy.user.CashierController;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 import java.math.BigDecimal;
 
@@ -25,6 +27,7 @@ public class PaymentController {
 
     private BigDecimal amountToPay; // Total amount to pay
     private BankPaymentClient paymentClient;
+    private CashierController cashierController;
 
     @FXML
     public void initialize() {
@@ -69,13 +72,46 @@ public class PaymentController {
             // Make the bank payment via the client
             String response = paymentClient.makeBankPayment(parsedCardNumber, amountToPay);
 
-            // Show success or error message
-            showAlert(Alert.AlertType.INFORMATION, "Payment Status", response);
+            if (response.equalsIgnoreCase("Payment processed successfully.")) {
+                // Notify the cashier controller to clear the cart
+                if (cashierController != null) {
+                    System.out.println("Notifying CashierController to clear the cart...");
+                    cashierController.clearCart();
+                } else {
+                    System.err.println("CashierController is not set.");
+                }
+
+                // Show success message and wait for user to confirm
+                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                successAlert.setTitle("Payment Successful");
+                successAlert.setHeaderText(null);
+                successAlert.setContentText("Your payment was processed successfully.");
+                successAlert.showAndWait(); // Wait for the user to click "OK"
+
+                // Close the payment window after the user acknowledges
+                Stage stage = (Stage) payButton.getScene().getWindow();
+                stage.close();
+
+            } else {
+                // Show failure alert
+                showAlert(Alert.AlertType.ERROR, "Payment Failed", response);
+            }
+
         } catch (NumberFormatException e) {
             showAlert(Alert.AlertType.ERROR, "Error", "Card number must be numeric.");
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error", "Failed to process payment: " + e.getMessage());
         }
+    }
+
+
+    /**
+     * Sets the cashier controller to enable communication.
+     *
+     * @param cashierController the CashierController instance
+     */
+    public void setCashierController(CashierController cashierController) {
+        this.cashierController = cashierController;
     }
 
     /**

@@ -5,12 +5,13 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+
 import java.math.BigDecimal;
 
 public class PaymentController {
 
     @FXML
-    private Label amountLabel;
+    private Label totalAmountLabel;
 
     @FXML
     private TextField cardNumberField;
@@ -18,56 +19,67 @@ public class PaymentController {
     @FXML
     private Button payButton;
 
-    private BigDecimal amountToPay;
+    @FXML
+    private TextField loginField;
 
-    private PaymentFacade paymentFacade;
 
-    public PaymentController() {
-        // Initialize with a dummy amount for testing; this can be set dynamically
-        this.amountToPay = new BigDecimal("100.00");
-        this.paymentFacade = new PaymentFacade(new PaymentService());
-    }
+    private BigDecimal amountToPay; // Total amount to pay
+    private BankPaymentClient paymentClient;
 
     @FXML
     public void initialize() {
-        amountLabel.setText(amountToPay.toString());
+        paymentClient = new BankPaymentClient(); // Initialize the BankPaymentClient
+        updateTotalAmount(); // Display the total amount in the UI
     }
 
     /**
-     * Handles the payment process.
-     * Gets the card number from the input field and attempts to process the payment.
+     * Sets the total amount to be paid.
+     *
+     * @param amount the total amount
+     */
+    public void setAmountToPay(BigDecimal amount) {
+        this.amountToPay = amount;
+        updateTotalAmount();
+    }
+
+    /**
+     * Updates the displayed total amount label.
+     */
+    private void updateTotalAmount() {
+        if (totalAmountLabel != null && amountToPay != null) {
+            totalAmountLabel.setText(String.format("%.2f NOK", amountToPay));
+        }
+    }
+
+    /**
+     * Handles the payment process when the "Pay Now" button is clicked.
      */
     @FXML
     private void handlePayment() {
-        String cardNumberText = cardNumberField.getText();
+        String cardNumber = cardNumberField.getText();
 
-        // Validate card number input
-        if (cardNumberText == null || cardNumberText.isEmpty()) {
+        if (cardNumber == null || cardNumber.isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Error", "Please enter or scan a valid card number.");
             return;
         }
 
         try {
-            int cardNumber = Integer.parseInt(cardNumberText);
+            int parsedCardNumber = Integer.parseInt(cardNumber);
 
-            // Call the facade to process the payment
-            String result = paymentFacade.processPayment(
-                    null, // Pass a generated or predefined transaction ID
-                    amountToPay,
-                    "Card Payment",
-                    cardNumber
-            );
+            // Make the bank payment via the client
+            String response = paymentClient.makeBankPayment(parsedCardNumber, amountToPay);
 
-            showAlert(Alert.AlertType.INFORMATION, "Payment Status", result);
+            // Show success or error message
+            showAlert(Alert.AlertType.INFORMATION, "Payment Status", response);
         } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Error", "Invalid card number format. Please enter a numeric card number.");
+            showAlert(Alert.AlertType.ERROR, "Error", "Card number must be numeric.");
         } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Payment Error", "Failed to process payment: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to process payment: " + e.getMessage());
         }
     }
 
     /**
-     * Displays an alert dialog to the user.
+     * Displays an alert dialog.
      *
      * @param alertType the type of alert
      * @param title     the title of the alert dialog
@@ -79,15 +91,5 @@ public class PaymentController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
-    }
-
-    /**
-     * Sets the amount to be paid, which will be displayed in the window.
-     *
-     * @param amount the amount to set
-     */
-    public void setAmountToPay(BigDecimal amount) {
-        this.amountToPay = amount;
-        amountLabel.setText(amount.toString());
     }
 }
